@@ -107,6 +107,23 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 .fbtns a{min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;border:1px solid var(--line);color:var(--fg)}
 .fbtns a[data-sns=instagram]{background:var(--brand);border-color:var(--brand);color:#fff}
 .fix .copy a{color:var(--sub)}
+.kit{position:fixed;inset:0;z-index:20;background:#000b;display:flex;align-items:flex-end;justify-content:center}
+.kitbox{width:100%;max-width:480px;max-height:92vh;overflow-y:auto;background:var(--bg);border-radius:20px 20px 0 0;padding:18px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-right,0px))}
+.kithead{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:-18px;background:var(--bg);padding:6px 0}
+.kithead h3{font-family:var(--disp);font-weight:400;font-size:24px}
+.kithead button{min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:10px;color:var(--sub)}
+.kitsub{font-size:13px;color:var(--sub);margin:4px 0 12px}
+.kitlist{list-style:none;display:grid;gap:8px}
+.kitlist li{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;display:grid;gap:12px}
+.kitlist li.have{opacity:.55}
+.kitlist li.kitsec{border:0;background:none;padding:10px 2px 0;font-size:13px;font-weight:700;color:var(--sub)}
+.kn{display:flex;gap:12px}.kn>div{min-width:0;display:grid;gap:3px}
+.kn i{flex:none;width:26px;height:26px;border-radius:13px;background:var(--line);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:13px;font-weight:800;color:var(--fg)}
+.kn b{font-size:17px}.kn span{font-size:14px;color:var(--fg)}.kn em{font-style:normal;font-size:13px;color:var(--sub);line-height:1.5}
+.kact{display:grid;grid-template-columns:1fr auto;gap:8px}
+.kact .buy{background:var(--brand);border-color:var(--brand);color:#fff;font-size:15px;font-weight:800;min-height:46px}.kact .buy::after{color:#fff}
+.khave{min-height:46px;padding:0 14px;border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--sub)}
+.khave[aria-pressed=true]{color:var(--fg);border-color:var(--fg)}
 .grp+.grp{margin-top:14px}.grp h3{font-size:13px;font-weight:600;color:var(--dim);letter-spacing:.04em}
 .why{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .why>div{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;min-width:0}
@@ -251,6 +268,15 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 </div></div>
 
 <div class="scan" id="scan"><div class="scanbox" id="scanChar" aria-hidden="true"></div><div class="t" id="scanT">동네 스캔 중…</div></div>
+<div class="kit" id="kit" hidden role="dialog" aria-modal="true" aria-labelledby="kitH">
+  <div class="kitbox">
+    <div class="kithead"><h3 id="kitH">생존 물품 리스트</h3><button id="kitClose" aria-label="닫기">닫기</button></div>
+    <p class="kitsub" id="kitSub"></p>
+    <ol class="kitlist" id="kitList"></ol>
+    <button class="more" id="kitToCheck">할 일까지 담긴 체크리스트 전체 보기</button>
+    <p class="note">"이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."</p>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -854,7 +880,36 @@ $('shForm').onsubmit=async e=>{e.preventDefault();
   $('shList').innerHTML=show.map(([la,lo,n,a,c,u])=>`<div class="shrow"><div><b>${esc(n)}</b><span>${esc(a)}</span><span>${u?'지하':'지상'} · 최대 ${c.toLocaleString()}명</span></div>
     <div class="act"><a href="https://map.kakao.com/link/map/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">지도</a><a href="https://map.kakao.com/link/to/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">길찾기</a></div></div>`).join('');
 };
-document.querySelectorAll('#menu [data-to]').forEach(b=>b.onclick=()=>{$(b.dataset.to).scrollIntoView({behavior:'smooth',block:'start'});track('menu',{to:b.dataset.to})});
+document.querySelectorAll('#menu [data-to]').forEach(b=>b.onclick=()=>{track('menu',{to:b.dataset.to});
+  if(b.dataset.to==='checkH'){openKit();return} // 생존 체크리스트 → 물품 리스트 창
+  $(b.dataset.to).scrollIntoView({behavior:'smooth',block:'start'})});
+// ── 생존 물품 리스트: 이 결과(위기·가구·층)에 필요한 살 수 있는 물건만, 물건마다 무엇·왜·쿠팡 ──
+function openKit(){
+  const seen=new Set(),rows=curItems.filter(t=>COUPANG[t]&&!seen.has(COUPANG[t].kw)&&seen.add(COUPANG[t].kw))
+    .sort((a,b)=>CHECK[S.c].includes(b)-CHECK[S.c].includes(a)); // 이 위기 물건 먼저
+  // 어떤 위기든 쓰이는 기본 비상 물품 (이미 위에 있으면 빼고)
+  const base=['호루라기 (구조 요청)','보온담요 · 핫팩','랜턴 (촛불 대신, 화재 예방)','신발 · 장갑을 머리맡에','방수 가방에 신분증·약']
+    .filter(t=>COUPANG[t]&&!seen.has(COUPANG[t].kw)&&seen.add(COUPANG[t].kw));
+  const nMain=rows.length;rows.push(...base);
+  $('kitH').textContent=`${CRISIS[S.c].short} 대비 생존 물품 ${rows.length}가지`;
+  $('kitSub').textContent=`${S.r} · ${HOME[S.h].name} · ${FLOOR[S.f]} 기준으로 골랐어요. 이미 있는 건 체크해 두면 체크리스트에도 표시돼요.`;
+  $('kitList').innerHTML='';
+  rows.forEach((t,i)=>{if(i===nMain&&base.length){const h=document.createElement('li');h.className='kitsec';h.textContent='모든 위기에 쓰는 기본 물품';$('kitList').append(h)}
+    const [need,why]=DETAIL[t]||['',''],li=document.createElement('li'),have=S.done.has(t);
+    li.className=have?'have':'';
+    li.innerHTML=`<div class="kn"><i>${i+1}</i><div><b>${esc(COUPANG[t].kw)}</b><span>${esc(need)}</span><em>${esc(why)}</em></div></div>
+      <div class="kact"><button class="khave" aria-pressed="${have}">${have?'있어요 ✓':'이미 있어요'}</button></div>`;
+    li.querySelector('.kact').prepend(buyLink(t,'쿠팡에서 보기','kit'));
+    li.querySelector('.khave').onclick=e=>{S.done.has(t)?S.done.delete(t):S.done.add(t);saveDone();const h=S.done.has(t);
+      e.target.setAttribute('aria-pressed',h);e.target.textContent=h?'있어요 ✓':'이미 있어요';li.className=h?'have':'';
+      // 아래 체크리스트의 같은 항목도 같이 표시
+      document.querySelectorAll('#check li').forEach(r=>{if(r.querySelector('.txt').textContent===t){r.classList.toggle('done',h);r.querySelector('.box').setAttribute('aria-pressed',h)}});prog(curItems)};
+    $('kitList').append(li)});
+  $('kit').hidden=false;document.body.style.overflow='hidden';track('kit_open',{n:rows.length});
+}
+const closeKit=()=>{$('kit').hidden=true;document.body.style.overflow=''};
+$('kitClose').onclick=closeKit;$('kit').onclick=e=>{if(e.target===$('kit'))closeKit()};
+$('kitToCheck').onclick=()=>{closeKit();$('checkH').scrollIntoView({behavior:'smooth',block:'start'})};
 document.querySelectorAll('[data-sns]').forEach(a=>a.addEventListener('click',()=>track('follow_click',{sns:a.dataset.sns,where:a.closest('footer')?'footer':'result'})));
 track('page_view',{src:new URLSearchParams(location.search).get('utm_source')||'direct'});
 // 친구가 보낸 결과 링크로 들어온 경우
