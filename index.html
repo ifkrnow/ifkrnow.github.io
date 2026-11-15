@@ -69,12 +69,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .lines p:first-child{border-left-color:var(--brand)}
 .tease{margin-top:10px;font-size:15px;font-weight:700;color:var(--brand2)}
 .verdict{font-size:16px;font-weight:600;line-height:1.45;text-wrap:balance}
-.tune{margin-top:10px;display:grid;gap:8px}
-.tune>div{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:6px;min-width:0}
-.tune span{font-size:13px;color:var(--sub)}
-.chips{position:relative;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:18px;font-size:14px;color:var(--sub)}
-.chip[aria-pressed=true]{border-color:var(--fg);color:var(--fg);font-weight:700}
 .detail{margin-top:10px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px}
 .detail .bar:first-child{margin-top:0}
 .more{width:100%;min-height:44px;margin-top:6px;color:var(--sub);font-size:14px}
@@ -150,11 +144,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <div class="story"><img id="cardImg" alt="결과 스토리 카드"></div>
   <div class="row2"><button id="copyCap">인스타 캡션 복사</button><button id="copyLink">결과 링크 복사</button></div>
   <p class="note">아래 버튼으로 저장하고, 안 되면 카드를 길게 눌러 사진에 저장하세요.</p>
-
-  <div class="tune">
-    <div><span>가구</span><div class="chips" id="chipH"></div></div>
-    <div><span>층</span><div class="chips" id="chipF"></div></div>
-  </div>
 
 
   <h2 id="whyH">왜 이 등급?</h2>
@@ -483,9 +472,7 @@ $('q').oninput=e=>{const q=e.target.value.trim().replace(/(특별|광역)?시$|�
   if(q&&shown.length===1&&S.r!==shown[0].dataset.r){S.r=shown[0].dataset.r;pick($('regions'),shown[0],false)} // 하나만 남으면 바로 선택(타이핑 중이라 스크롤은 안 함)
 };
 
-// 고른 칩이 가로 스크롤 밖에 있으면 보이게 (결과 화면이 보인 뒤에만 위치를 잴 수 있음)
-const syncChips=()=>document.querySelectorAll('.chips').forEach(c=>{const b=c.querySelector('[aria-pressed=true]');if(b)c.scrollLeft=b.offsetLeft-40});
-function showResult(){requestAnimationFrame(syncChips);setTimeout(syncChips,120);$('input').hidden=true;$('result').hidden=false;$('back').hidden=S.shared;$('friend').hidden=!S.shared;
+function showResult(){$('input').hidden=true;$('result').hidden=false;$('back').hidden=S.shared;$('friend').hidden=!S.shared;
   $('go').classList.remove('wait');$('go').textContent=S.shared?'내 동네도 해보기':'스토리 카드 저장';scrollTo(0,0)}
 function showInput(){if(S.shared)Object.assign(S,{r:null,c:null,h:null,f:null});S.shared=false;$('result').hidden=true;$('input').hidden=false;$('back').hidden=true;$('friend').hidden=true;
   try{history.replaceState(null,'',location.pathname+location.search)}catch{}updateCTA();scrollTo(0,0)}
@@ -513,11 +500,6 @@ function render(){
   try{history.replaceState(null,'',hashOf())}catch{}
   const bars=barKeys().map(k=>`<div class="bar"><span>${AX[k]}</span><i><u style="width:${val(v,k)}%"></u></i><span>${val(v,k)}</span></div>`).join('');
   const lines=analysis(); // 맨 위는 스토리 카드 이미지가 대신함 (등급·점수·순위·표정이 다 들어 있음)
-  // 결과 화면에서 바로 조건 바꾸기 (재실행 유도)
-  const chip=(box,list,cur,on)=>{$(box).innerHTML='';list.forEach(([k,n])=>{const b=document.createElement('button');b.className='chip';b.textContent=n;
-    b.setAttribute('aria-pressed',k===cur);b.onclick=()=>{on(k);render();track('tune',{box})};$(box).append(b)});requestAnimationFrame(syncChips)};
-  chip('chipH',Object.entries(HOME).map(([k,h])=>[k,h.name]),S.h,k=>S.h=k);
-  chip('chipF',FLOOR.map((n,i)=>[i,n]),S.f,k=>S.f=k);
   $('detail').innerHTML=bars+`<div class="lines">${lines.map(t=>`<p>${t}</p>`).join('')}</div>`;
 
   const [bad,good]=whyOf(),li=a=>a.map(t=>`<li>${t}</li>`).join('');
