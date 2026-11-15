@@ -92,7 +92,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 #input h1{font-size:24px}
 #input .tease{margin-top:4px;font-size:14px}
 #input .search{height:44px}
-@media (max-height:740px){#input .intro{display:none}#input .tease{margin-top:10px;font-size:15px}#st1>.note:last-child{display:none}} /* 낮은 폰: 1단계도 한 화면에 */
+@media (max-height:740px){#input .intro{display:none}#input .tease{margin-top:10px;font-size:15px}#st1>.note:last-child{display:none}.grid5 .opt{min-height:34px}} /* 낮은 폰: 1단계도 한 화면에 */
 .stepbar{margin-top:14px;display:grid;gap:10px}
 .stepbar .dots{display:flex;align-items:center;gap:6px}
 .stepbar .dots i{width:22px;height:4px;border-radius:2px;background:var(--line)}.stepbar .dots i.done{background:var(--sub)}.stepbar .dots i.on{background:var(--brand);width:34px}
@@ -125,11 +125,11 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 .khave{min-height:46px;padding:0 14px;border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--sub)}
 .khave[aria-pressed=true]{color:var(--fg);border-color:var(--fg)}
 .grp+.grp{margin-top:14px}.grp h3{font-size:13px;font-weight:600;color:var(--dim);letter-spacing:.04em}
-.why{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.why{display:grid;grid-template-columns:1fr;gap:8px}
 .why>div{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;min-width:0}
 .why h4{font-size:13px;color:var(--sub);font-weight:600;margin-bottom:6px}
-.why>div:first-child h4{color:var(--brand2)}
-.why ul{list-style:none;display:grid;gap:4px;font-size:15px}.why li::before{content:'· ';color:var(--dim)}
+.why>div:first-of-type h4{color:var(--brand2)}
+.why ul{list-style:none;display:grid;gap:6px;font-size:16px;line-height:1.45}.why small{display:block;margin-top:10px;font-size:13px;color:var(--sub)}.why li::before{content:'· ';color:var(--dim)}
 .why p{grid-column:1/-1;font-size:13px;color:var(--sub)}
 .why p.ins{font-size:16px;font-weight:700;color:var(--fg);line-height:1.5;padding:14px 16px;border-left:3px solid var(--brand);background:var(--card);border-radius:0 12px 12px 0;text-wrap:pretty}
 .check{list-style:none;display:grid;gap:6px}
@@ -159,8 +159,8 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 .note{font-size:13px;color:var(--sub);margin-top:8px}
 .story{margin-top:12px}.story img{width:100%;max-width:100%;aspect-ratio:9/16;border-radius:16px;border:1px solid var(--line);display:block;background:var(--card);transition:opacity .15s}.story img.busy{opacity:.45}
 .row2{display:flex;gap:8px;margin-top:10px}.row2 button{flex:1;min-height:52px;border:1px solid var(--line);border-radius:12px;font-weight:700;font-size:15px;background:var(--card)}
-.sharebox{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}.sharebox>b{display:block;font-size:17px;margin-bottom:10px}
-.sharebox .send{width:100%;min-height:58px;border-radius:14px;background:var(--brand);color:#fff;font-weight:800;font-size:18px}
+.sharebox{margin-top:12px;display:grid;gap:4px}.sharebox>b{display:block;font-size:17px;margin-bottom:10px}
+.sharebox .send{width:100%;min-height:54px;border-radius:14px;border:1px solid var(--fg);color:var(--fg);font-weight:800;font-size:17px}
 .sharebox .row2 button{background:var(--bg)}.sharebox .capbtn{width:100%;margin-top:8px;min-height:44px;color:var(--sub);font-size:14px;text-decoration:underline}
 .fix{margin-top:36px;font-size:13px;line-height:1.6;color:var(--sub);border-top:1px solid var(--line);padding-top:16px;display:grid;gap:8px}
 .fix h4{font-size:13px;color:var(--fg);font-weight:700;margin-top:6px}.fix b{color:var(--fg)}.fix .copy{color:var(--dim)}
@@ -181,7 +181,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
       <div><h1>당신의 동네는,<br>버틸 수 있을까?</h1></div>
       <div id="introChar" aria-hidden="true"></div>
     </div>
-    <p class="tease">전국 40곳 중 S등급은 단 한 곳. 우리 동네는?</p>
+    <p class="tease" id="tease"></p>
   </div>
   <!-- 한 번에 한 단계씩: 1 사는 곳 → 2 위기 → 3 누구와 → 4 층 -->
   <div class="stepbar" id="stepbar"></div>
@@ -211,10 +211,8 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
   <div class="friend" id="friend" hidden><b>친구가 보낸 결과예요</b>내 동네는 몇 등급일까? 아래 버튼으로 10초 진단</div>
   <div class="story"><img id="cardImg" alt="결과 스토리 카드"></div>
   <div class="sharebox" id="shareBox">
-    <b>친구 동네는 몇 등급일까?</b>
-    <button id="sendLink" class="send">친구에게 결과 보내기</button>
-    <div class="row2"><button id="copyLink">링크 복사</button><button id="saveCard">카드 저장·스토리 공유</button></div>
-    <button id="copyCap" class="capbtn">인스타 캡션 복사</button>
+    <button id="saveCard" class="send">카드 저장 · 인스타 스토리 올리기</button>
+    <button id="copyCap" class="capbtn">게시물용 캡션 복사</button>
   </div>
 
 
@@ -293,7 +291,9 @@ const R = {
   안성:[52,58,62,45,40,40], 동두천:[12,52,55,42,45,35], 부천:[12,82,55,80,15,90], 안산:[30,74,40,60,25,80],
   순천:[70,62,58,48,45,40], 수원:[28,82,58,75,15,85], 고양:[15,80,52,72,20,80], 성남:[20,84,58,78,15,85],
   청주:[52,72,62,58,30,55], 천안:[58,70,62,55,30,55], 춘천:[55,62,62,45,50,30], 강릉:[42,58,48,42,55,35],
-  경주:[55,58,22,42,45,45], 목포:[70,58,40,40,55,40], 원주:[45,62,62,48,40,40], 의정부:[14,70,55,60,25,65]
+  경주:[55,58,22,42,45,45], 목포:[70,58,40,40,55,40], 원주:[45,62,62,48,40,40], 의정부:[14,70,55,60,25,65],
+  // 땅굴이 발견된 접경 3곳 (11/16 추가)
+  연천:[8,45,55,35,55,15], 철원:[6,42,60,35,60,12], 양구:[8,40,60,30,65,8]
 };
 // 지역별 급소 문장 [전쟁, 아파트 폭격, 정전, 지진·침수, 독가스]
 const NOTE = {
@@ -336,51 +336,62 @@ const NOTE = {
   경주:['원전이 가까운 동해안 내륙 도시.','표적 우선순위는 중간이다.','원전 주변이라 전력 복구 순서는 앞쪽.','2016년 규모 5.8 지진. 활성단층이 지난다.','분지 지형이라 가스가 머물 수 있다.'],
   목포:['표적 가치가 낮은 서남해안 항구.','고층 단지가 적은 편이다.','서남해 끝이라 지원이 늦게 닿는다.','바다를 메운 땅과 저지대가 약점.','접경에서 멀고 바다 바람이 있다.'],
   원주:['공군 비행장이 있는 강원 내륙 도시.','비행장 주변 단지가 반경 안에 든다.','혁신도시 신축 단지라 망은 새것이다.','내륙 산지, 지반은 단단한 편.','분지라 바람이 약하면 가스가 머문다.'],
-  의정부:['접경 가까운 서울 북쪽 길목.','포 사거리 안. 경보 후 시간이 짧다.','서울과 붙어 복구는 빠른 편.','산과 하천 사이 도심.','접경이라 일찍 닿을 수 있다.']
+  의정부:['접경 가까운 서울 북쪽 길목.','포 사거리 안. 경보 후 시간이 짧다.','서울과 붙어 복구는 빠른 편.','산과 하천 사이 도심.','접경이라 일찍 닿을 수 있다.'],
+  연천:['DMZ와 맞닿고 제1땅굴이 발견된 최전방.','고층이 적다. 대신 피할 시간도 짧다.','송전선·도로가 적어 끊기면 오래 간다.','임진강은 북한 댐 방류로 갑자기 불어난다.','접경이라 바람이 남쪽으로 불면 바로 온다.'],
+  철원:['제2땅굴이 발견된 중부전선 한가운데.','고층이 적다. 대신 피할 시간이 짧다.','겨울 한파가 매서워 난방이 끊기면 위험하다.','한탄강 협곡과 평야. 범람이 변수.','접경이라 일찍, 짙게 닿을 수 있다.'],
+  양구:['제4땅굴이 발견된 동부전선 산간.','고층 건물이 거의 없다. 병원이 멀다.','산길 몇 개뿐이라 끊기면 오래 간다.','산간 계곡 범람과 산사태가 변수.','사람이 적지만 접경과 가깝다.']
 };
-// 왜 이 등급? [불리한 점, 버티는 점] — 댓글 답글처럼 지역별 사실만
-const WHY = {
-  서울:[['수도·정부 기관 집중','인구 밀집'],['지하 대피 공간 최다','병원·복구 인력 최다']],
-  인천:[['공항·항만','서해 접경 섬'],['공항·항만 보급','대형 병원']],
-  평택:[['주한미군 최대 기지','평택항'],['평야 지대 지반','신축 단지 지하주차장']],
-  대전:[['정부청사·연구단지'],['접경에서 멂','국토 중앙이라 지원이 빠름']],
-  부산:[['항만·해군작전사령부','인구 밀집'],['바닷길 보급','6·25 때 끝까지 지킨 후방']],
-  제주:[['해군기지','본토와 떨어진 섬'],['전선에서 멂','센 바람']],
-  울릉도:[['배가 끊기면 고립','큰 병원 없음'],['표적 가치 거의 없음']],
-  포항:[['제철소·해병대','2017년 지진 이력'],['동해안 항만']],
-  김포:[['한강 건너 바로 북한','다리·도로가 적음'],['신도시 인프라']],
-  파주:[['DMZ와 맞닿은 최전방'],['인구 밀도 낮음']],
-  영월:[['큰 병원이 멂','송전선 고립'],['표적에서 가장 먼 산간','인구 적음']],
-  여수:[['석유화학 국가산단'],['접경에서 멂']],
-  창원:[['방산 기업 밀집'],['산이 둘러싼 지형']],
-  광주:[['공군 비행장'],['접경에서 멂','대형 병원']],
-  대구:[['도심 가까운 공군 기지','분지라 가스 정체'],['접경에서 멂','안정된 지반']],
-  울산:[['정유·화학 공단','원전 인접'],['대도시 인프라']],
-  세종:[['정부세종청사'],['접경에서 멂','신도시 지하주차장']],
-  거제:[['대형 조선소','다리에 의존하는 섬'],['접경에서 멂','남해 바닷길']],
-  진해:[['해군기지·해군사관학교'],['산이 감싼 지형']],
-  김해:[['김해공항 인접'],['부산 생활권 인프라']],
-  전주:[['도청 소재지'],['주요 기지·접경에서 멂','평야 농업 기반']],
-  군산:[['미 공군 군산기지','서해안 저지대'],['항만 보급']],
-  진도:[['진도대교 하나로 연결','큰 병원이 멂'],['표적 가치 낮음','인구 적음']],
-  논산:[['육군훈련소·국방대학교','계룡대 인접'],['인구 적음']],
-  안성:[['평택 기지 인접'],['내륙','인구 밀도 낮은 편']],
-  동두천:[['접경 가까움','미군 기지'],['산이 많은 지형']],
-  부천:[['서울·인천 사이 인구 밀집','피난길 혼잡'],['지하철·지하공간','병원 많음']],
-  안산:[['반월·시화 국가산단','서해안 매립지'],['지하철·대형 병원']],
-  순천:[['여수·광양 산단 인접'],['접경에서 멂','내륙 쪽']],
-  수원:[['공군 비행장','인구 밀집'],['대도시 인프라','지하공간 많음']],
-  고양:[['접경 가까움','한강 북쪽'],['신도시 지하주차장','대형 병원']],
-  성남:[['서울공항(군 비행장)','인구 밀집'],['대도시 인프라','산을 낀 지형']],
-  청주:[['공군 비행장·청주공항'],['접경에서 멂','국토 중앙']],
-  천안:[['교통 요지'],['접경에서 멂','물자가 빨리 닿음']],
-  춘천:[['전방 부대와 가까움'],['인구 적음','산·호수 지형']],
-  강릉:[['공군 비행장','동해안 해일'],['접경에서 거리가 있음']],
-  경주:[['원전 인접','2016년 지진·활성단층'],['접경에서 멂']],
-  목포:[['서남해 끝이라 지원이 늦음','저지대'],['표적 가치 낮음']],
-  원주:[['공군 비행장'],['내륙 산지 지반']],
-  의정부:[['접경 가까움','서울 북쪽 길목'],['지하철·도심 인프라']]
+// 지역별 실제 시설·사건 [k: 주요 시설, f: 이유 목록]
+// f 형식 '부호 태그:문장' — 부호 -불리 +버팀 / 태그 m 공습·폭격·독가스, a 아파트, g 가스 확산, n 원전, q 지진·침수, t 해일, f 산불, o 정전·먹통·보급, p 감염병, h 모든 위기
+const FAC = {
+  서울:{k:['용산 대통령실·국방부','지하철역 300여 곳','한강 다리 30여 개'],f:['-m:대통령실·국방부가 있는 1순위 표적','+m:수도권 방공망이 가장 촘촘','+ma:지하철·지하상가 대피 공간 최다','-a:고층 아파트 숲, 유리 파편 위험','-o:한강 다리 끊기면 강남북 단절','+o:복구 인력·장비 1순위 투입','-q:2022 폭우 때 반지하 침수 참사','-g:지하철역에 가스가 고일 수 있음','+h:상급종합병원이 가장 많음']},
+  인천:{k:['인천국제공항','인천항·인천신항','영흥화력발전소','서해5도'],f:['-m:인천공항·인천항, 핵심 보급 표적','-m:2010 연평도 포격 겪은 서해 접경','+m:공항·항만 방공 전력 배치','-a:송도·청라 초고층 단지','-o:영종·송도·섬은 다리 몇 개로 연결','+o:영흥화력 등 발전소가 시 안에','-q:송도·청라는 바다 메운 매립지','-g:서해 바람이 내륙 쪽으로 붊','-p:공항 관문, 해외 유입 첫 지점','+h:길병원·인하대병원 등 대형 병원']},
+  평택:{k:['캠프 험프리스','오산 공군기지','해군 2함대','평택항'],f:['-m:주한미군 최대 기지 캠프 험프리스','-m:오산 공군기지·해군 2함대까지','+m:패트리엇 등 미군 방공망 배치','-a:기지 주변 신축 단지 밀집','+a:신축 단지 지하주차장 넓음','-o:삼성 반도체 등 산단 전력 우선','+o:평택항·LNG 기지 보급 거점','-g:평야라 가스가 막힘없이 퍼짐','-q:안성천·진위천 범람 변수','+q:평야 지대 무난한 지반']},
+  대전:{k:['정부대전청사','대덕연구단지','하나로 연구용 원자로'],f:['-m:정부청사·대덕연구단지','+m:접경에서 약 190km','-n:연구용 원자로 하나로가 시 안에','+o:국토 중앙, 사방에서 지원 도착','+q:지반이 단단한 내륙 분지','-g:분지라 바람 약하면 가스 정체','+h:충남대·을지대 등 대형 병원']},
+  부산:{k:['해군작전사령부','부산항(국내 최대)','고리원전(기장)'],f:['-m:해군작전사령부·주한미해군사령부','-m:국내 최대 부산항, 보급 표적','+m:6·25 때 끝까지 지킨 후방','-n:고리원전 30km 안에 시민 대부분','-a:산비탈 아파트, 소방차 접근 어려움','-t:해운대 마린시티 태풍 월파 이력','+o:바닷길로 물자 보급 가능','+h:부산대·동아대 등 대형 병원']},
+  제주:{k:['강정 해군기지','제주국제공항','본토 연결 해저케이블'],f:['-m:강정 민군복합항(해군기지)','+m:전선에서 가장 먼 곳','-o:해저케이블 끊기면 전력 고립','-o:배·비행기 멈추면 물자 끊김','-t:태풍 길목, 해안 저지대','+g:섬 바람이 세 가스가 빨리 흩어짐','+a:저층 건물 위주, 탈출 빠름','-h:중증 환자는 본토 이송이 잦음']},
+  울릉도:{k:['도동항·사동항','독도 관할','울릉공항(건설 중)'],f:['-o:배편이 사실상 유일한 길','-o:기상 나쁘면 며칠씩 결항','-h:큰 병원 없음, 중환자는 헬기 이송','-q:가파른 화산섬, 산사태·낙석','-t:해안 도로·항구가 바다 바로 앞','+m:군사 표적 가치 거의 없음','+g:바람이 세 가스가 머물지 못함','+a:아파트 거의 없음','+p:사람 적고 외부 왕래 제한']},
+  포항:{k:['포스코 포항제철소','해병대 1사단','해군 6항공전단','영일만항'],f:['-m:포항제철소, 국가 기간산업 표적','+m:해병대 1사단 주둔','-q:2017년 규모 5.4 지진, 액상화 확인','-g:제철소 화학물질 2차 누출 우려','-o:제철소 전력 수요가 커 복구 경쟁','+o:영일만항 바닷길','+h:포항 시내 종합병원 여럿']},
+  김포:{k:['애기봉(북한까지 1.4km)','해병대 2사단','한강하구','김포골드라인'],f:['-m:한강 건너 북한까지 1.4km(애기봉)','-m:북한 포 사거리 안 신도시','+m:해병대 2사단이 지키는 접경','-o:서울 가는 길이 다리·도로 몇 개','-o:피난 땐 2량 골드라인이 병목','-q:한강 하구 저지대 침수','-g:접경이라 가장 먼저 닿음','+a:신도시 지하주차장','+h:서울 대형 병원과 가까움']},
+  파주:{k:['제3땅굴(1978 발견)','판문점·JSA','도라전망대','육군 1사단'],f:['-m:DMZ와 맞닿은 최전방','-m:1978년 제3땅굴 발견 지역','-m:못 찾은 땅굴 추정이 계속 나옴','+m:육군 1사단 등 전방 부대 밀집','-o:임진강 다리 끊기면 고립','-q:임진강 범람 이력','-g:바람이 남쪽이면 가장 먼저 도달','+a:운정 신도시 지하주차장']},
+  영월:{k:['동강·서강','영월발전소','38번 국도'],f:['+m:표적에서 가장 먼 산간','+g:사람 적고 표적 없음','-g:골짜기엔 가스가 고임','-h:대형 병원은 원주까지 1시간','-o:송전선·도로 하나 끊기면 마을 고립','+o:영월발전소가 지역 안에','-q:동강·서강 계곡 범람','+a:고층 건물 거의 없음']},
+  여수:{k:['여수국가산단','여수광양항','이순신대교'],f:['-m:국내 최대 석유화학 산단','-m:산단 폭발이 주거지로 번질 위험','-g:유독가스 2차 누출 겹칠 수 있음','+m:접경에서 가장 먼 남해','-o:산단 전력 우선, 섬은 배에 의존','+o:여수광양항 바닷길 보급','-q:매립 산단·해안 저지대','-h:상급 병원은 광주에 기댐']},
+  창원:{k:['창원국가산단(방산)','한화에어로·현대로템','마산항','마창대교'],f:['-m:K9 자주포·K2 전차 만드는 방산 산단','+m:진해 해군 전력이 가까움','-g:산에 둘러싸인 분지형 도심','-o:공단 전력 수요 커 복구 경쟁','-o:마산·진해 잇는 고개·터널 병목','-qt:2003 태풍 매미 때 마산 해안 침수','+a:계획도시라 단지 간격 넓음','+h:삼성창원병원 등 대형 병원']},
+  광주:{k:['공군 1전투비행단','광주공항','전남대·조선대병원'],f:['-m:공군 1전투비행단(광주공항)','+m:접경에서 300km 넘게','+o:호남 교통 중심, 사방 우회로','+q:내륙 평지, 지진·침수 무난','-g:분지형 도심, 바람 약한 날 정체','+h:전남대·조선대병원 가까움']},
+  대구:{k:['공군 K-2 기지','대구국제공항','미군 캠프 워커','제2작전사령부'],f:['-m:도심 속 K-2 공군기지','-m:미군 캠프 워커·2작전사령부','+m:접경에서 250km 넘게','-g:대표 분지, 가스가 빠지지 않음','-o:여름 폭염 땐 정전이 더 위험','+o:대도시 복구 인력·장비','+q:비교적 안정된 지반','+h:경북대·계명대 등 대형 병원']},
+  울산:{k:['SK 울산CLX(정유)','석유화학단지','현대차·HD현대중공업','새울원전'],f:['-m:정유·석유화학 국가산단','-m:현대차·조선소, 산업 표적','-g:화학 공단 2차 누출 우려','-q:울산단층 등 활성단층 지남','-o:공단 전력 수요 전국 최상위','+o:울산항, 액체화물 처리 국내 1위','+h:울산대병원']},
+  세종:{k:['정부세종청사','대통령 세종집무실(건립 중)','금강'],f:['-m:정부세종청사, 행정 표적','+m:접경에서 약 170km','+a:신도시 단지 지하주차장 넓음','+o:새 도시라 전력망·도로가 새것','-q:금강변 저지대','-h:상급 병원은 대전에 기댐']},
+  거제:{k:['한화오션 옥포조선소','삼성중공업 조선소','거가대교·거제대교'],f:['-m:대형 조선소 두 곳, 산업 표적','+m:접경에서 가장 먼 남해 섬','-o:다리 두 개로만 육지와 연결','+o:남해 바닷길로 보급 가능','-t:남해안 해안 저지대·태풍','+g:바닷바람이 가스를 빨리 흩음','-h:중증은 부산·창원으로 이송']},
+  진해:{k:['해군 진해기지사령부','해군사관학교','잠수함사령부'],f:['-m:해군 진해기지·잠수함사령부','-m:해군사관학교까지 모인 군항','+m:해군 전력이 바로 옆','-g:산에 막힌 항구, 가스 정체','-o:고개·터널 막히면 빠져나가기 어려움','+o:부산항 신항 바닷길 인접','-t:바다 앞 저지대','+h:창원 생활권 대형 병원']},
+  김해:{k:['김해국제공항','공군 5공중기동비행단','낙동강 하류'],f:['-m:김해공항·공군 비행단 인접','+m:부산 방공망 안쪽','-q:낙동강 하류 평야, 범람 변수','+o:부산과 같은 전력·물류망','-o:낙동강 다리 끊기면 길이 좁아짐','+g:평야라 바람 맞으면 잘 흩어짐','+h:부산 대형 병원 가까움']},
+  전주:{k:['전북특별자치도청','전북대병원','호남고속도로'],f:['+m:큰 군사 표적이 적음','+m:접경에서 약 250km','-m:그만큼 방공 전력도 멀다','+o:평야 농업, 먹거리가 가까움','-o:기름은 밖에서 들어와야 함','+q:내륙 평야, 지반 무난','+h:전북대병원(상급종합)']},
+  군산:{k:['미 공군 군산기지','새만금 방조제','군산항','군산국가산단'],f:['-m:미 공군 군산기지(8전투비행단)','+m:미군 방공 전력 배치','-qt:바다를 메운 새만금·산단','+o:군산항 바닷길','-o:산단 전력 수요로 순서 밀림','-g:서해 바람이 내륙 쪽으로 붊','-h:상급 병원은 전주·익산']},
+  진도:{k:['진도대교','팽목항','울돌목'],f:['-o:진도대교 하나로 육지와 연결','-h:큰 병원은 목포·광주까지','+m:표적 가치 거의 없음','-t:섬 해안 저지대','+g:바람이 세고 사람 적음','+o:농수산물 자급 가능','+a:고층 건물 거의 없음']},
+  논산:{k:['육군훈련소','국방대학교','계룡대(인접)'],f:['-m:육군훈련소·국방대학교','-m:3군 본부 계룡대 바로 옆','+m:군 방어 전력이 많음','-g:군 시설이 많아 화학 표적 가능','+o:대전과 가까워 지원 빠름','+o:평야 농업, 먹거리가 가까움','-q:논산천·금강 범람 변수','-h:상급 병원은 대전에 기댐']},
+  안성:{k:['캠프 험프리스(인접)','경부고속도로'],f:['-m:평택 미군 기지와 맞닿음','+m:미군 방공망 안쪽','+o:경부고속도로가 지남','-o:막히면 돌아갈 길이 적음','+q:내륙, 지진·침수 무난','-g:평택에서 바람 불면 영향권','-h:대형 병원은 평택·수원']},
+  동두천:{k:['미군 캠프 케이시','캠프 호비','3번 국도'],f:['-m:미군 캠프 케이시 주둔','-m:접경에서 20여 km, 포 사거리 안','+m:미군·전방 부대가 막아섬','-o:서울 가는 길이 몇 개뿐','-q:신천·동두천 하천 범람','-g:접경이라 일찍 닿음','-h:대형 병원은 의정부']},
+  부천:{k:['지하철 1·7호선','서해선','서울·인천 사이 관문'],f:['-m:서울·인천 사이 피난 병목','+m:수도권 방공망 안','-a:아파트가 다닥다닥 붙음','+a:지하철역·지하상가 많음','-p:서울과 맞먹는 인구 밀도','-o:사람이 많아 물자 경쟁 빠름','-q:굴포천 일대 저지대 침수','+h:부천성모·순천향대병원']},
+  안산:{k:['반월·시화 국가산단','시화호·시화방조제','고려대 안산병원'],f:['-m:반월·시화 국가산단','-g:산단 화학물질 누출 겹칠 위험','+m:접경과 거리가 있음','-q:서해안 매립지가 많음','-o:시화방조제 길 막히면 고립','+a:4호선·수인분당선 지하역','+h:고려대 안산병원']},
+  순천:{k:['순천만','광양제철소(인접)','여수산단(인접)'],f:['+m:접경에서 멀다','-m:여수·광양 산단 사이','-g:산단 누출 땐 영향권','+o:전라선·경전선 교통 거점','-o:피난민이 몰리는 거점','-t:순천만 해안 저지대','+q:시내는 내륙 쪽']},
+  수원:{k:['공군 10전투비행단','삼성전자 수원사업장','경기도청','아주대병원'],f:['-m:도심 속 공군 10전투비행단','-m:삼성전자 본사 사업장','+m:수도권 방공망 안','+o:도청 소재지, 복구 빠름','-o:인구 120만, 물자가 빨리 동남','+a:지하공간 많음','+h:아주대병원 등 대형 병원']},
+  고양:{k:['일산 신도시','킨텍스','국립암센터','자유로'],f:['-m:접경에서 20여 km','+m:수도권 방공망 안','-a:일산 고층 단지, 계단 탈출이 길다','+a:신도시 지하주차장 넓음','-o:한강 다리 건너야 서울·김포','-q:한강변 저지대','-g:접경 바람이 불면 일찍 닿음','+h:국립암센터·일산병원']},
+  성남:{k:['서울공항(공군 15비행단)','판교테크노밸리','분당서울대병원'],f:['-m:서울공항(군 비행장)','+m:수도권 방공망 안','-a:분당·판교 고층 단지','+a:신도시 지하주차장','-o:2022 판교 데이터센터 화재 먹통','-o:서울 가는 길 막히면 차량 몰림','+o:서울과 같은 전력망','+h:분당서울대병원']},
+  청주:{k:['공군 17전투비행단','공군사관학교','청주국제공항','SK하이닉스 청주'],f:['-m:공군 17전투비행단·청주공항','-m:공군사관학교·반도체 공장','+m:접경에서 약 150km','-q:2023 오송 지하차도 침수 참사','+o:국토 중앙, 공항까지 길이 여럿','-g:분지라 바람 약하면 정체','+h:충북대병원']},
+  천안:{k:['천안아산역(KTX)','경부·논산천안고속도로','독립기념관'],f:['-m:경부선·고속도로 교통 요지','+m:접경에서 약 120km','+o:물자가 가장 빨리 모이는 길목','-o:피난 차량도 몰림','+q:내륙 평지','+h:단국대·순천향대 천안병원']},
+  춘천:{k:['육군 2군단','소양강댐(국내 최대)','의암댐'],f:['-m:전방 부대와 가까운 강원 북부','+m:육군 2군단이 지킴','-mq:소양강댐, 맞으면 하류 홍수','-o:산·호수에 둘러싸여 길이 적음','-q:호수·하천 범람 변수','-g:분지라 바람 약하면 정체','+a:고층 건물 적은 편','+h:강원대·한림대 춘천성심병원']},
+  강릉:{k:['공군 18전투비행단','KTX 강릉선','강릉아산병원'],f:['-m:공군 18전투비행단','-m:1996 북한 잠수함 침투 해안','-t:동해안, 지진해일에 열림','-f:2023 경포 산불 등 봄 산불 잦음','-o:대관령 막히면 지원이 늦음','+o:KTX 강릉선 연결','+g:바닷바람이 가스를 흩음','+h:강릉아산병원']},
+  경주:{k:['월성·신월성원전','중저준위 방폐장','2016 지진 진앙'],f:['-n:중저준위 방폐장도 시 안에','-q:2016년 규모 5.8 지진 진앙','-q:양산단층 등 활성단층','+m:큰 군사 표적이 적음','-g:분지 지형, 가스 정체','+o:원전 주변이라 전력 복구 앞쪽','-h:중증은 포항·울산·대구로']},
+  목포:{k:['목포항','해군 3함대(인접)','목포대교'],f:['+m:표적 가치 낮음','-m:해군 3함대가 가까움','-o:서남해 끝, 지원이 늦게 닿음','+o:항만 바닷길','-q:바다 메운 땅·저지대','+g:바닷바람이 가스를 흩음','-h:상급 병원은 광주까지 1시간']},
+  원주:{k:['공군 8전투비행단','원주세브란스기독병원','혁신도시'],f:['-m:공군 8전투비행단','+m:접경에서 약 100km','+o:강원 관문, 길이 여럿','+a:혁신도시 신축 단지','-g:분지라 바람 약하면 정체','+q:산지 단단한 지반','+h:원주세브란스 권역외상센터']},
+  의정부:{k:['3번 국도·1호선','의정부성모병원','의정부경전철'],f:['-m:전방 가는 길목, 접경 30km대','-o:서울 가는 길이 몇 개뿐','+o:서울과 붙어 복구 빠름','+a:지하철·경전철 역','-q:중랑천 범람 변수','-g:접경이라 일찍 닿음','+h:의정부성모·을지대병원']},
+  연천:{k:['제1땅굴(1974 발견)','임진강·군남댐','태풍전망대'],f:['-m:DMZ와 맞닿은 최전방','-m:1974년 제1땅굴 발견 지역','+m:전방 사단이 지키는 곳','-q:북한 댐 방류로 6명 숨진 임진강','+q:군남댐이 방류에 대비','-o:도로가 몇 개뿐','-g:접경이라 가장 먼저 닿음','-h:대형 병원은 의정부·동두천']},
+  철원:{k:['제2땅굴(1975 발견)','백마고지','노동당사'],f:['-m:1975년 제2땅굴 발견 지역','-m:DMZ와 맞닿은 철원평야','+m:3개 사단이 지키는 중부전선','-o:겨울 영하 20도, 정전 땐 치명적','+o:철원평야, 쌀 자급','-q:한탄강 협곡·범람','-g:접경이라 가장 먼저 닿음','-h:대형 병원은 의정부·춘천']},
+  양구:{k:['제4땅굴(1990 발견)','펀치볼(해안면)','을지전망대'],f:['-m:1990년 제4땅굴 발견 지역','-m:DMZ 바로 아래 펀치볼','+m:육군 21사단이 지키는 동부전선','-o:산길 몇 개, 끊기면 고립','-g:접경이라 일찍 닿음','+p:인구 2만여 명, 접촉이 적음','-h:대형 병원은 춘천까지']}
 };
+// 행안부 민방위대피시설 자료에서 센 지역별 대피소 수 [전체, 지하] (2026-11-15 기준) + 대피소 검색에서 "내 지역" 판정용 주소 키
+const SHN = {"서울":[2903,2902],"인천":[795,768],"평택":[132,132],"대전":[626,626],"부산":[1315,1315],"제주":[455,455],"울릉도":[8,8],"포항":[116,116],"김포":[201,200],"파주":[192,192],"영월":[48,48],"여수":[128,128],"창원":[389,389],"광주":[588,587],"대구":[776,776],"울산":[499,499],"세종":[178,178],"거제":[107,107],"진해":[138,138],"김해":[85,85],"전주":[206,206],"군산":[81,80],"진도":[22,21],"논산":[26,26],"안성":[65,65],"동두천":[53,53],"부천":[218,218],"안산":[156,156],"순천":[81,81],"수원":[282,282],"고양":[464,464],"성남":[238,237],"청주":[239,239],"천안":[130,130],"춘천":[93,93],"강릉":[76,76],"경주":[55,55],"목포":[148,146],"원주":[99,99],"의정부":[114,114],"연천":[37,35],"철원":[33,23],"양구":[16,10]};
+const SHK = {울릉도:['울릉군'],영월:['영월군'],진도:['진도군'],연천:['연천군'],철원:['철원군'],양구:['양구군'],진해:['진해구'],창원:['의창구','성산구','마산'],
+  광주:['전남광주통합특별시 동구','전남광주통합특별시 서구','전남광주통합특별시 남구','전남광주통합특별시 북구','광산구']};
 // 양면 해설: 같은 사실이 지켜 주기도 하고 위험하게도 만든다. [군사형(공습·폭격·독가스·원전), 생활형(정전·지진·해일·산불·감염병·먹통)]
 const INSIGHT = {
   서울:['수도라 방공망이 가장 촘촘하지만, 바로 그래서 가장 먼저 노려진다.','한강 다리가 끊기면 강 남북이 갈려 물자와 병원 이동이 막힌다.'],
@@ -422,26 +433,31 @@ const INSIGHT = {
   경주:['접경에서 멀지만, 원전이 가까워 원전이 노려지면 위험이 커진다.','큰 산업 표적은 적지만, 활성단층이 지나 지진에 약하다.'],
   목포:['표적 가치가 낮지만, 서남해 끝이라 지원이 가장 늦게 닿는다.','항만으로 바닷길은 열려 있지만, 저지대라 물에 약하다.'],
   원주:['공군 비행장이 지키지만, 그 비행장이 표적이 될 수 있다.','강원의 관문이라 들어오는 길이 여럿이고, 기반 시설이 새것이다.'],
-  의정부:['전방으로 가는 길목이라 군 전력이 지나가지만, 그 길목이 노려진다.','서울로 가는 길이 몇 개뿐이라 피난길이 막히기 쉽다.']
+  의정부:['전방으로 가는 길목이라 군 전력이 지나가지만, 그 길목이 노려진다.','서울로 가는 길이 몇 개뿐이라 피난길이 막히기 쉽다.'],
+  연천:['전방 사단이 가장 먼저 막아서지만, 땅굴이 발견된 최전방이라 피할 시간이 가장 짧다.','군남댐이 막아 주지만, 북한 댐이 물을 풀면 임진강이 갑자기 불어난다.'],
+  철원:['3개 사단이 지키는 중부전선이지만, 철원평야는 예부터 남침 길목이었다.','평야라 쌀은 자급하지만, 한겨울 정전이면 영하 20도 추위가 먼저 온다.'],
+  양구:['산이 막아 주는 동부전선이지만, 제4땅굴이 나올 만큼 북한과 가깝다.','사람이 적어 물자 경쟁은 없지만, 산길이 끊기면 큰 병원까지 가기 어렵다.']
 };
-const MILC = new Set(['war','apt','gas','nuke']); // 군사형 해설을 쓰는 위기
-const insightOf = (r,c) => INSIGHT[r][MILC.has(c)?0:1];
-const GROUP = {수도권:['서울','인천','수원','성남','고양','부천','안산','의정부','김포','파주','동두천','평택','안성'],
+const MILC = new Set(['war','apt','gas']); // 군사형 해설을 쓰는 위기
+// 원전·지진·해일·산불·감염병은 군사/생활 해설이 안 맞아서 그 위기 전용 지역 문장을 쓴다
+const insightOf = (r,c) => MILC.has(c)?INSIGHT[r][0]:(c==='out'||c==='cyber')?INSIGHT[r][1]:noteOf(r,c);
+const GROUP = {수도권:['서울','인천','수원','성남','고양','부천','안산','의정부','김포','파주','동두천','연천','평택','안성'],
   충청:['대전','세종','청주','천안','논산'], 호남:['광주','전주','군산','순천','여수','목포','진도'],
-  영남:['부산','대구','울산','창원','진해','김해','거제','포항','경주'], '강원·제주·섬':['춘천','원주','강릉','영월','제주','울릉도']};
+  영남:['부산','대구','울산','창원','진해','김해','거제','포항','경주'], '강원·제주·섬':['춘천','원주','강릉','영월','철원','양구','제주','울릉도']};
 // 목록에 없는 동네·군 이름 → 가까운(또는 비슷한) 지역으로 계산
 const ALIAS = {강남:'서울',송파:'서울',잠실:'서울',마포:'서울',노원:'서울',은평:'서울',관악:'서울',영등포:'서울',
   송도:'인천',부평:'인천',영종:'인천',해운대:'부산',화명:'부산',서면:'부산',기장:'부산',양산:'부산',
   분당:'성남',판교:'성남',일산:'고양',옥길:'부천',광명:'부천',시흥:'안산',화성:'수원',용인:'수원',
   송탄:'평택',오산:'평택',계룡:'논산',광양:'순천',익산:'전주',전북:'전주',마산:'창원',통영:'거제',
-  포천:'동두천',양주:'동두천',연천:'동두천',속초:'강릉',동해:'강릉',서귀포:'제주',아산:'천안',
+  포천:'동두천',양주:'동두천',전곡:'연천',김화:'철원',화천:'양구',인제:'양구',속초:'강릉',동해:'강릉',서귀포:'제주',아산:'천안',
   구미:'대구',경산:'대구',대덕:'대전',영양:'영월',봉화:'영월',정선:'영월',태백:'영월'};
 // 추가 계수 [nuke 원전 거리 안전, coast 해안(해일) 안전, forest 산불 안전] — 0~100, 높을수록 안전
 const EX = {서울:[90,85,80],인천:[90,50,80],평택:[85,70,80],대전:[75,95,65],부산:[15,40,60],제주:[95,40,75],울릉도:[80,20,50],
   포항:[40,30,40],김포:[90,60,80],파주:[90,80,70],영월:[70,95,40],여수:[65,50,60],창원:[50,55,55],광주:[45,95,70],대구:[60,95,55],
   울산:[15,35,50],세종:[80,95,70],거제:[55,45,55],진해:[50,55,55],김해:[35,70,65],전주:[60,95,70],군산:[55,50,75],진도:[60,45,60],
   논산:[75,90,70],안성:[85,95,70],동두천:[90,95,60],부천:[90,85,85],안산:[90,55,80],순천:[65,75,55],수원:[90,95,80],고양:[90,85,80],
-  성남:[90,95,70],청주:[80,95,65],천안:[85,95,70],춘천:[85,95,50],강릉:[65,25,20],경주:[15,60,45],목포:[50,50,70],원주:[80,95,55],의정부:[90,95,65]};
+  성남:[90,95,70],청주:[80,95,65],천안:[85,95,70],춘천:[85,95,50],강릉:[65,25,20],경주:[15,60,45],목포:[50,50,70],원주:[80,95,55],의정부:[90,95,65],
+  연천:[90,95,55],철원:[90,95,50],양구:[85,95,40]};
 Object.keys(R).forEach(r=>R[r].push(...EX[r]));
 // 원전·해일·산불은 위험원에서 멀기만 하면 90점대가 나와서 S가 흔해짐 → 폭을 줄여 "멀면 A, 가까우면 C·D"로
 const squeeze=x=>20+x*.55;
@@ -489,9 +505,22 @@ const TIER = {
   cyber:(r,[,,,,o,l])=>l>=75?'카드·간편결제에 가장 많이 기대는 대도시. 현금 없으면 편의점도 못 간다.':o>=60?'외진 곳이라 원래 현금·이웃 거래가 남아 있다.':'현금 조금이면 버틸 수 있는 정도.'
 };
 // 왜 이 등급? [불리한 점, 버티는 점] — 결과 화면과 스토리 카드가 같이 씀
-const whyOf=()=>{const [xb,xg]=WHYX[S.c]?WHYX[S.c](S.r):[null,null];
-  return [[xb,...WHY[S.r][0].filter(t=>!(xb&&xb.includes('원전')&&t.includes('원전')))].filter(Boolean).slice(0,3),[xg,...WHY[S.r][1]].filter(Boolean).slice(0,3)]};
-const bestAx=()=>CRISIS[S.c].ax.map(([k,w])=>[k,val(R[S.r],k)*w]).sort((a,b)=>b[1]-a[1])[0][0];
+const CT={war:'m',apt:'ma',gas:'mg',nuke:'n',quake:'q',tsu:'t',fire:'f',out:'o',pand:'p',cyber:'o'};
+const factsOf=(r,c,sign)=>{const sp=[],gen=[];for(const s of FAC[r].f){const i=s.indexOf(':'),tags=s.slice(1,i),t=s.slice(i+1);if(s[0]!==sign)continue;
+  if([...tags].some(x=>CT[c].includes(x)))sp.push(t);else if(tags.includes('h'))gen.push(t)}return [...sp,...gen]};
+const whyOf=()=>{let [xb,xg]=WHYX[S.c]?WHYX[S.c](S.r):[null,null];
+  const fb=factsOf(S.r,S.c,'-');if(xb&&xb.includes('원전')&&fb.some(t=>t.includes('원전')))xb=null; // 같은 말 두 번 안 하게
+  const bad=[xb,...fb].filter(Boolean).slice(0,3),good=[xg,...factsOf(S.r,S.c,'+')].filter(Boolean).slice(0,3);
+  // 이 위기에 맞는 사실이 없으면 계수로 한 줄 (값이 애매하면 과장하지 않는 문장)
+  const ax=CRISIS[S.c].ax.map(([k])=>[k,val(R[S.r],k)]).sort((p,q)=>p[1]-q[1]);
+  const own=k=>WHYX[S.c]&&['nuke','coast','forest'].includes(k); // 원전·해안·산림 거리는 위기 줄(WHYX)이 이미 말함
+  for(const [k,v] of ax)if(bad.length<2&&v<50&&!own(k))bad.push(WEAK[k]);
+  for(const [k,v] of [...ax].reverse())if(good.length<2&&v>=60&&!own(k))good.push(GOODS[k]);
+  if(!bad.length)bad.push('이 위기엔 큰 약점이 드문 편');
+  if(!good.length)good.push('버틸 구석이 적은 편');
+  return [bad,good]};
+const WEAK={war:'표적 시설과 가까운 편',infra:'전기·물 복구가 늦을 수 있음',terrain:'지반·배수가 약한 편',shelter:'지하 대피 공간이 부족한 편',iso:'외부 지원이 늦게 닿음',load:'사람이 많아 물자 경쟁이 빠름',nuke:'원전과 가까운 편',coast:'바다와 가까운 편',forest:'산림과 가까운 편'};
+const GOODS={war:'표적 시설과 거리가 있음',infra:'전기·물 복구가 빠른 편',terrain:'지반·배수가 안정적',shelter:'지하 대피 공간이 넉넉함',iso:'외부 지원이 빨리 닿음',load:'사람이 덜 몰려 물자 여유',nuke:'원전에서 멂',coast:'바다에서 멂',forest:'큰 산림과 거리가 있음'};
 const pts=n=>`${n>0?'+':n<0?'−':'±'}${Math.abs(n)}점`;
 const barKeys=()=>[...new Set([...CRISIS[S.c].ax.map(a=>a[0]),'war','infra','terrain','shelter'])].slice(0,4); // 그 위기에 중요한 지표 먼저
 const noteOf=(r,c)=>TIER[c]?TIER[c](r,R[r]):NOTE[r][Object.keys(CRISIS).indexOf(c)];
@@ -717,6 +746,7 @@ $('q').oninput=e=>{const q=e.target.value.trim().replace(/(특별|광역)?시$|�
   $('qhint').textContent=none?'아직 없는 지역이에요. 아래 목록에서 가까운 곳을 골라 주세요.':via.map(([a,r])=>`${eun(a)} ${r} 기준으로 계산해요`).join(' · ');
   if(none)$('regions').querySelectorAll('.opt,.grp').forEach(el=>el.hidden=false);
   const shown=[...$('regions').querySelectorAll('.opt')].filter(b=>!b.hidden);
+  if(S.r&&!shown.some(b=>b.dataset.r===S.r)){S.r=null;$('regions').querySelectorAll('.opt').forEach(b=>b.setAttribute('aria-pressed','false'));updateCTA()} // 검색으로 가려진 선택은 풀기
   if(q&&shown.length===1&&S.r!==shown[0].dataset.r){S.r=shown[0].dataset.r;pick($('regions'),shown[0],false)} // 하나만 남으면 바로 선택(타이핑 중이라 스크롤은 안 함)
 };
 
@@ -735,18 +765,19 @@ function start(){
 }
 $('go').onclick=()=>{
   if(S.shared){track('friend_try',{from:S.r});showInput();return}
-  if($('result').hidden===false){$('sendLink').click();return}
+  if($('result').hidden===false){sendResult();return}
   const cur=STEP[step-1];if(S[cur.k]===null){toast(cur.msg);return}
   step<4?showStep(step+1):start();
 };
 $('back').onclick=()=>$('result').hidden?showStep(Math.max(1,step-1)):showInput();
+$('tease').textContent=`전국 ${NR}곳 중 S등급은 단 한 곳. 우리 동네는?`;
 renderBar();updateCTA();document.querySelector('footer').hidden=true;
 
 function analysis(){
   const v=R[S.r],c=CRISIS[S.c];
-  const best=c.ax.map(([k,w])=>[k,val(v,k)*w]).sort((a,b)=>b[1]-a[1])[0][0];
+  const best=c.ax.map(([k])=>[k,val(v,k)]).sort((a,b)=>b[1]-a[1])[0],bv=best[1];
   const fa=c.fl[S.f];
-  return [noteOf(S.r,S.c), `버틸 구석 — ${AX[best]}: ${STRONG[best]}.`,
+  return [noteOf(S.r,S.c)===insightOf(S.r,S.c)?null:noteOf(S.r,S.c), bv>=60?`버틸 구석 — ${AX[best[0]]}(${bv}점): ${STRONG[best[0]]}.`:`뚜렷한 버틸 구석이 없어요. 그나마 나은 건 ${AX[best[0]]}(${bv}점).`,
     `${FLOOR[S.f]} ${fa>0?'+':fa<0?'−':'±'}${Math.abs(fa)}점. ${c.ft}`, `${HOME[S.h].line} ${c.hint}`];
 }
 
@@ -754,7 +785,7 @@ function render(){
   const sc=scoreOf(S.r,S.c,S.h),g=gradeOf(sc),v=R[S.r],rk=rankOf(S.r,S.c,S.h,S.f);
   try{history.replaceState(null,'',hashOf())}catch{}
   const bars=barKeys().map(k=>`<div class="bar"><span>${AX[k]}</span><i><u style="width:${val(v,k)}%"></u></i><span>${val(v,k)}</span></div>`).join('');
-  const lines=analysis(); // 맨 위는 스토리 카드 이미지가 대신함 (등급·점수·순위·표정이 다 들어 있음)
+  const lines=analysis().filter(Boolean); // 맨 위는 스토리 카드 이미지가 대신함 (등급·점수·순위·표정이 다 들어 있음)
   $('detail').innerHTML=bars+`<div class="lines">${lines.map(t=>`<p>${t}</p>`).join('')}</div>`;
 
   const [bad,good]=whyOf(),li=a=>a.map(t=>`<li>${t}</li>`).join('');
@@ -762,7 +793,7 @@ function render(){
   const WHEN={war:'공습이 오면',apt:'폭격을 맞으면',out:'정전이 되면',quake:'지진이 나면',gas:'독가스가 퍼지면',nuke:'원전 사고가 나면',tsu:'해일이 오면',fire:'산불이 번지면',pand:'감염병이 돌면',cyber:'통신·결제가 멈추면'};
   $('followH').textContent=`${WHEN[S.c]}, ${eun(S.r)}? 영상으로 먼저 봐요`;
   $('why').innerHTML=`<p class="ins">${esc(insightOf(S.r,S.c))}</p><div><h4>불리한 점</h4><ul>${li(bad)}</ul></div><div><h4>버티는 점</h4><ul>${li(good)}</ul></div>
-    <p>층·가구 조건: ${FLOOR[S.f]} ${CRISIS[S.c].fl[S.f]>0?'+':CRISIS[S.c].fl[S.f]<0?'−':'±'}${Math.abs(CRISIS[S.c].fl[S.f])}점, ${HOME[S.h].name} ${HOME[S.h].adj>=0?'+':'−'}${Math.abs(HOME[S.h].adj)}점</p>`;
+    <div><h4>${S.r} 주요 시설</h4><ul>${li(FAC[S.r].k)}</ul><small>민방위 대피소 ${SHN[S.r][0].toLocaleString()}곳 (지하 ${SHN[S.r][1].toLocaleString()}곳) · 행정안전부 자료</small></div>`;
   const items=[...CHECK.base,...CHECK[S.c],...CHECK[S.h],FLCHECK[S.f]];
   $('check').innerHTML='';
   // 왼쪽 네모 = 준비 완료 체크, 글자 = 펼쳐서 무엇을·왜 + 쿠팡 버튼
@@ -822,7 +853,7 @@ function charSVG(g){
 <rect x="-5" y="170" width="210" height="40" fill="#7c7976" stroke="${K}" stroke-width="3"/><rect x="-5" y="166" width="210" height="8" fill="#dcbcaa" stroke="${K}" stroke-width="3"/><path d="M58 174v36M142 174v36" stroke="${K}" stroke-width="2" opacity=".5"/></g></svg>`;
 }
 
-let cardBlob=null,cardSeq=0;
+let cardBlob=null,cardSeq=0,cardBottom=0;
 async function drawCard(sc,g){
   if($('cardImg').src)$('cardImg').classList.add('busy'); // 새 카드 나올 때까지 이전 카드 흐리게
   const seq=++cardSeq,W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
@@ -837,35 +868,35 @@ async function drawCard(sc,g){
   const fit=(t,maxW)=>{if(x.measureText(t).width<=maxW)return t;while(t.length>1&&x.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t+'…'};
   const L=96,RX=935;
   x.font=`700 38px ${F}`;x.fillStyle=brand;x.fillText('내 동네 위기 시뮬레이터',L,330);
-  x.fillStyle=fg;x.font=`400 104px ${D}`;x.fillText(S.r,L,440);
-  x.font=`600 40px ${F}`;x.fillStyle=sub;x.fillText(`${CRISIS[S.c].name} · ${HOME[S.h].name} · ${FLOOR[S.f]}`,L,505);
-  x.drawImage(img,600,535,320,320);
-  x.fillStyle=fg;x.font=`400 350px ${D}`;x.fillText(g,84,835);
-  x.font=`600 46px ${F}`;x.fillStyle=sub;x.fillText('안전점수',L,915);x.fillStyle=fg;x.font=`800 50px ${F}`;x.fillText(`${sc} / 100`,300,915);
-  x.font=`600 38px ${F}`;x.fillStyle=sub;x.fillText(`같은 조건 ${NR}곳 중 `,L,972);const w=x.measureText(`같은 조건 ${NR}곳 중 `).width;
-  x.fillStyle='#ff8a2c';x.font=`800 38px ${F}`;x.fillText(`${rankOf(S.r,S.c,S.h,S.f)}위`,L+w,972);
-  // 왜 이 등급? — 불리한 점 / 버티는 점 2칸
-  x.fillStyle='#2e2926';x.fillRect(L,1012,RX-L,2);
-  x.font=`400 46px ${D}`;x.fillStyle=fg;x.fillText(`왜 ${g}등급?`,L,1078);
-  // 양면 해설 한 문장 (최대 3줄로 줄바꿈) — 아래 내용은 줄 수만큼 내려감
+  x.fillStyle=fg;x.font=`400 104px ${D}`;x.fillText(S.r,L,436);
+  x.font=`600 38px ${F}`;x.fillStyle=sub;x.fillText(`${CRISIS[S.c].name} · ${HOME[S.h].name} · ${FLOOR[S.f]}`,L,496);
+  x.drawImage(img,630,520,290,290);
+  x.fillStyle=fg;x.font=`400 320px ${D}`;x.fillText(g,84,800);
+  x.font=`600 44px ${F}`;x.fillStyle=sub;x.fillText('안전점수',L,876);x.fillStyle=fg;x.font=`800 48px ${F}`;x.fillText(`${sc} / 100`,290,876);
+  x.font=`600 38px ${F}`;x.fillStyle=sub;const rt=`같은 조건 ${NR}곳 중 `;x.fillText(rt,L,930);const w=x.measureText(rt).width;
+  x.fillStyle='#ff8a2c';x.font=`800 38px ${F}`;x.fillText(`${rankOf(S.r,S.c,S.h,S.f)}위`,L+w,930);
+  x.fillStyle='#2e2926';x.fillRect(L,962,RX-L,2);
+  // 왜 이 등급? — 양면 해설(최대 3줄) → 불리한 점 2 → 버티는 점 2 → 주요 시설·층·가구
+  x.font=`400 46px ${D}`;x.fillStyle=fg;x.fillText(`왜 ${g}등급?`,L,1026);
   const wrap=(t,maxW)=>{const out=[];let line='';for(const w of t.split(' ')){const s=line?line+' '+w:w;if(x.measureText(s).width>maxW&&line){out.push(line);line=w}else line=s}if(line)out.push(line);return out.slice(0,3)};
-  x.font=`700 38px ${F}`;const ins=wrap(insightOf(S.r,S.c),RX-L-26);
-  x.fillStyle=brand;x.fillRect(L,1104,6,ins.length*54+6);x.fillStyle=fg;ins.forEach((l,i)=>x.fillText(l,L+26,1144+i*54));
-  const off=ins.length*54+30;
-  const [bad,good]=whyOf(),CW=(RX-L-40)/2,C2=L+CW+40;
-  x.font=`800 34px ${F}`;x.fillStyle='#ff8a2c';x.fillText('불리한 점',L,1140+off);x.fillStyle=sub;x.fillText('버티는 점',C2,1140+off);
-  x.font=`700 37px ${F}`;x.fillStyle=fg;
-  bad.slice(0,2).forEach((t,i)=>x.fillText(fit('· '+t,CW),L,1196+off+i*54));
-  good.slice(0,2).forEach((t,i)=>x.fillText(fit('· '+t,CW),C2,1196+off+i*54));
-  // 버틸 구석 · 층 · 가구 점수
+  x.font=`700 37px ${F}`;const ins=wrap(insightOf(S.r,S.c),RX-L-26);
+  x.fillStyle=brand;x.fillRect(L,1052,6,ins.length*52+4);x.fillStyle=fg;ins.forEach((l,i)=>x.fillText(l,L+26,1090+i*52));
+  let y=1090+(ins.length-1)*52+74;const KW=170;
+  const [bad,good]=whyOf();
+  const group=(label,col,items)=>{items.slice(0,2).forEach((t,i)=>{if(!i){x.font=`800 34px ${F}`;x.fillStyle=col;x.fillText(label,L,y)}
+    x.font=`700 36px ${F}`;x.fillStyle=fg;x.fillText(fit(t,RX-L-KW),L+KW,y);y+=52});if(items.length)y+=16};
+  group('불리한 점','#ff8a2c',bad);group('버티는 점',sub,good);
+  // 주요 시설은 통째로 들어가는 것만 이어 붙임 (중간에 잘리지 않게)
+  x.font=`600 34px ${F}`;let fac='';for(const k of FAC[S.r].k){const t=fac?fac+' · '+k:k;if(x.measureText(t).width>RX-L-KW)break;fac=t}
   const fl=CRISIS[S.c].fl[S.f],ft=CRISIS[S.c].ft.split('.')[0];
-  [['버틸 구석',AX[bestAx()]],[`${FLOOR[S.f]} ${pts(fl)}`,ft],[`${HOME[S.h].name} ${pts(HOME[S.h].adj)}`,HOME[S.h].why]].forEach(([k,t],i)=>{
-    const y=1326+off+i*56;x.font=`800 35px ${F}`;x.fillStyle=i?(String(k).includes('−')?'#ff8a2c':fg):'#ff8a2c';x.fillText(k,L,y);const kw=x.measureText(k+'  ').width;
-    x.font=`600 35px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y)});
-  x.fillStyle='#2e2926';x.fillRect(L,1466+off,RX-L,2);
+  [['주요 시설',fac,sub],[`${FLOOR[S.f]} ${pts(fl)}`,ft,fl<0?'#ff8a2c':fg],[`${HOME[S.h].name} ${pts(HOME[S.h].adj)}`,HOME[S.h].why,HOME[S.h].adj<0?'#ff8a2c':fg]].forEach(([k,t,col])=>{
+    x.font=`800 34px ${F}`;x.fillStyle=col;x.fillText(k,L,y);const kw=Math.max(KW,x.measureText(k+'  ').width);
+    x.font=`600 34px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y);y+=52});
+  x.fillStyle='#2e2926';x.fillRect(L,y-14,RX-L,2);
   // 다른 위기 등급은 일부러 안 보여 줌 → 직접 들어와서 돌려 보게
-  x.font=`400 66px ${D}`;x.fillStyle=fg;x.fillText('우리 동네는 몇 등급?',L,1552+off);
-  x.font=`600 33px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now 프로필 링크 · 공식 등급 아님',L,1606+off);
+  x.font=`400 66px ${D}`;x.fillStyle=fg;x.fillText('우리 동네는 몇 등급?',L,y+64);
+  x.font=`600 33px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now 프로필 링크 · 공식 등급 아님',L,y+116);
+  cardBottom=y+116;
   cv.toBlob(b=>{if(seq!==cardSeq)return;cardBlob=b;$('cardImg').src=URL.createObjectURL(b);$('cardImg').classList.remove('busy')},'image/png');
 }
 $('introChar').innerHTML=charSVG('C');$('scanChar').innerHTML=charSVG('C');
@@ -884,18 +915,13 @@ $('copyCap').onclick=async()=>{
 };
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1600)}
 $('saveCard').onclick=share;
-$('sendLink').onclick=async()=>{
+async function sendResult(){
   const u=location.origin+location.pathname+'?utm_source=share&utm_medium=send'+hashOf(),g=gradeOf(scoreOf(S.r,S.c,S.h));
   const t=`${CRISIS[S.c].name} 오면 ${S.r} ${g}등급 나왔어. 우리 동네는 몇 등급?`;
   track('link_send');
   try{if(navigator.share){await navigator.share({title:'내 동네 위기 시뮬레이터',text:t,url:u});return}}catch(e){if(e.name==='AbortError')return}
   try{await navigator.clipboard.writeText(t+' '+u);toast('링크를 복사했어요. 카톡에 붙여 넣으세요')}catch{toast('복사가 막혔어요. 주소창 링크를 복사하세요')}
-};
-$('copyLink').onclick=async()=>{
-  const u=location.origin+location.pathname+'?utm_source=share&utm_medium=link'+hashOf();
-  track('link_copy');
-  try{await navigator.clipboard.writeText(u);toast('결과 링크를 복사했어요')}catch{toast('복사가 막혔어요. 주소창 링크를 복사하세요')}
-};
+}
 // ── 우리 동네 대피소 찾기: shelters.json(행안부 민방위대피시설)을 누를 때만 불러와 동네 이름으로 거름. 위치정보 안 씀 ──
 // 행: [위도, 경도, 시설명, 주소, 수용인원, 지하1/지상0, 동네]
 let SH=null;
@@ -908,10 +934,14 @@ $('shForm').onsubmit=async e=>{e.preventDefault();
   let rows;try{rows=await loadSH()}catch{$('shMsg').textContent='대피소 자료를 불러오지 못했어요. 잠시 뒤 다시 해 주세요.';return}
   // 동 이름은 '화명동'·'화명' 둘 다 받게 끝의 동/읍/면/리 글자를 떼고 비교
   const core=q.replace(/(동|읍|면|리)$/,'');
-  const hit=rows.filter(r=>(r[6]+r[3]).replace(/\s+/g,'').includes(q)||r[6].split(' ').some(t=>t.replace(/(\d+)?(동|읍|면|리|가)$/,'')===core));
+  // 도로명(예: 오룡중앙동로)에 걸리지 않게 지번 동네 + 도로명 주소 괄호 속 동 이름에서만 찾음
+  const dongOf=r=>r[6]+' '+((r[3].match(/\(([^,)]+)/)||[])[1]||'');
+  // 동 이름이 딱 맞는 곳(도동 → 울릉 도동) 먼저, 없을 때만 일부 일치(송도 → 송도동)
+  const exact=rows.filter(r=>dongOf(r).split(' ').some(t=>{const u=t.replace(/(\d+)?(동|읍|면|리|가)$/,'');return t===q||u===q||u===core}));
+  const hit=exact.length?exact:rows.filter(r=>dongOf(r).replace(/\s+/g,'').includes(q));
   track('shelter_search',{n:hit.length}); // 입력한 동네 이름은 보내지 않음
   if(!hit.length){$('shMsg').textContent=`'${raw}'로 찾은 대피소가 없어요. 동·읍·면 이름으로 다시 넣어 보세요.`;return}
-  const mine=r=>S.r&&(r[6]+r[3]).includes(S.r)?1:0; // 같은 이름 동이 여러 도시에 있으면 진단한 지역 먼저
+  const mine=r=>{if(!S.r)return 0;const a=r[6]+' '+r[3];return (SHK[S.r]||[S.r]).some(k=>a.includes(k))?1:0}; // 같은 이름 동이 여러 도시에 있으면 진단한 지역 먼저
   hit.sort((a,b)=>mine(b)-mine(a)||b[5]-a[5]||b[4]-a[4]); // 그다음 지하 시설·큰 곳 먼저
   const show=hit.slice(0,8);
   $('shMsg').textContent=`${hit.length}곳 찾았어요${hit.length>8?' · 수용인원 큰 곳 8개만 보여요':''}`;
@@ -933,7 +963,7 @@ function openKit(){
     secs.push([cat,uniq(keys)])}
   const starts=new Map();secs.forEach(([cat,list])=>{if(list.length){starts.set(rows.length,cat);rows.push(...list)}});
   $('kitH').textContent=`${CRISIS[S.c].short} 대비 생존 물품 ${rows.length}가지`;
-  $('kitSub').textContent=`${S.r} · ${HOME[S.h].name} · ${FLOOR[S.f]} 기준으로 골랐어요. 이미 있는 건 체크해 두면 체크리스트에도 표시돼요.`;
+  $('kitSub').textContent=`${S.r} · ${HOME[S.h].name} · ${FLOOR[S.f]} 기준으로 골랐어요. 이미 있는 건 「이미 있어요」를 눌러 두면 다음에도 기억해요.`;
   $('kitList').innerHTML='';
   rows.forEach((t,i)=>{if(starts.has(i)){const h=document.createElement('li');h.className='kitsec';h.textContent=starts.get(i);$('kitList').append(h)}
     const [need,why]=DETAIL[t]||['',''],li=document.createElement('li'),have=S.done.has(t);
