@@ -99,8 +99,9 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 #input h1{font-size:24px}
 #input .tease{margin-top:4px;font-size:14px}
 #input .search{height:44px}
+@media (max-height:860px){#st1>.note:last-child{display:none}} /* 「우리 동네가 없나요」 안내가 아래 버튼에 가리지 않게 */
 @media (max-height:680px){.grid5{gap:5px}.grid5 .opt{min-height:31px!important;padding:3px 2px}} /* 360×640 같은 더 낮은 폰 */
-@media (max-height:740px){#input .intro{display:none}#input .tease{margin-top:10px;font-size:15px}#st1>.note:last-child{display:none}.grid5 .opt{min-height:34px}} /* 낮은 폰: 1단계도 한 화면에 */
+@media (max-height:740px){#input .intro{display:none}#input .tease{margin-top:10px;font-size:15px}#st1>.note:last-child{display:none}#input .fun{display:none}.grid5 .opt{min-height:34px}} /* 낮은 폰: 1단계도 한 화면에 */
 .stepbar{margin-top:14px;display:grid;gap:10px}
 .stepbar .dots{display:flex;align-items:center;gap:6px}
 .stepbar .dots i{width:22px;height:4px;border-radius:2px;background:var(--line)}.stepbar .dots i.done{background:var(--sub)}.stepbar .dots i.on{background:var(--brand);width:34px}
@@ -165,6 +166,8 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 .place{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;display:grid;gap:10px}
 .place div{display:flex;justify-content:space-between;gap:12px;font-size:15px}.place small{color:var(--sub);white-space:nowrap}
 .note{font-size:13px;color:var(--sub);margin-top:8px}
+.fun{font-size:13px;color:var(--sub);margin-top:6px}
+.funbox{margin-top:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:13px;line-height:1.55;color:var(--sub)}.funbox b{display:block;color:var(--fg);font-size:14px;margin-bottom:2px}
 .story{margin-top:12px}.story img{width:100%;max-width:100%;aspect-ratio:9/16;border-radius:16px;border:1px solid var(--line);display:block;background:var(--card);transition:opacity .15s}.story img.busy{opacity:.45}
 .row2{display:flex;gap:8px;margin-top:10px}.row2 button{flex:1;min-height:52px;border:1px solid var(--line);border-radius:12px;font-weight:700;font-size:15px;background:var(--card)}
 .sharebox{margin-top:12px;display:grid;gap:4px}
@@ -191,6 +194,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
       <div id="introChar" aria-hidden="true"></div>
     </div>
     <p class="tease" id="tease"></p>
+    <p class="fun">재미로 보는 시뮬레이션이에요 · 맹신은 금물</p>
   </div>
   <!-- 한 번에 한 단계씩: 1 사는 곳 → 2 위기 → 3 누구와 → 4 층 -->
   <div class="stepbar" id="stepbar"></div>
@@ -226,6 +230,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
   <div class="copybox" id="copyBox" hidden><b></b><textarea readonly rows="3"></textarea><button type="button" onclick="this.parentNode.hidden=true">닫기</button></div>
 
 
+  <p class="funbox"><b>재미로 보는 시뮬레이션이에요</b>공개 자료와 정한 계수로 계산한 참고용 점수라, 실제 위험을 판정하거나 안전을 보장하지 않아요. 맹신하지 말고, 실제 상황에선 재난문자와 정부·지자체 안내를 따르세요.</p>
   <h2 id="whyH">왜 이 등급?</h2>
   <div class="why" id="why"></div>
   <div class="detail" id="detail"></div>
@@ -262,7 +267,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 
 <footer class="fix">
   <h4>꼭 읽어 주세요</h4>
-  <p>이 사이트의 등급·점수·순위는 <b>실제 안전 등급이 아닙니다.</b> 공개 자료와 ifkr.now가 정한 계수를 같은 공식으로 계산한 <b>시뮬레이션 결과</b>이며, 실제 재난 피해나 정부·전문기관의 판단과 다를 수 있습니다. 특정 지역을 깎아내리거나 불안을 키우려는 목적이 없습니다.</p>
+  <p><b>재미로 보는 시뮬레이션입니다. 결과를 맹신하지 마세요.</b> 이 사이트의 등급·점수·순위는 <b>실제 안전 등급이 아닙니다.</b> 공개 자료와 ifkr.now가 정한 계수를 같은 공식으로 계산한 <b>시뮬레이션 결과</b>이며, 실제 재난 피해나 정부·전문기관의 판단과 다를 수 있습니다. 특정 지역을 깎아내리거나 불안을 키우려는 목적이 없습니다.</p>
   <h4>점수는 이렇게 계산해요</h4>
   <p>지역마다 9가지 지표(0~100)에 위기별 가중치를 곱해 더하고, 가구·층 조건 점수를 더하고 뺍니다. 이 중 4가지는 <b>공개 자료로 계산</b>합니다. ① 타격 거리 = 시청에서 군사분계선까지 직선거리 60% + 주요 군사·국가 시설 수 40% ② 원전 거리 = 가장 가까운 원전까지 직선거리 ③ 대피 인프라 = 주민 1명당 민방위 대피소 수용 인원(행정안전부) ④ 인구 밀집 = 인구 밀도(2024년 말 인구·면적 근삿값). 회복력·지형·보급 속도·해안·산불 5가지는 지역 특성을 보고 ifkr.now가 정한 값입니다. 등급은 S 80점 이상, A 65, B 50, C 35, D 그 아래입니다.</p>
   <p>실제 재난 상황에서는 재난문자와 정부·지자체 공식 안내(안전디딤돌 앱, 국민재난안전포털)를 항상 먼저 따르세요.</p>
@@ -1012,8 +1017,9 @@ async function drawCard(sc,g){
   x.fillStyle='#2e2926';x.fillRect(L,y-14,RX-L,2);
   // 다른 위기 등급은 일부러 안 보여 줌 → 직접 들어와서 돌려 보게
   x.font=`400 66px ${D}`;x.fillStyle=fg;x.fillText('우리 동네는 몇 등급?',L,y+64);
-  x.font=`600 33px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now 프로필 링크 · 공식 등급 아님',L,y+116);
-  cardBottom=y+116;
+  x.font=`600 33px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now · 재미로 보는 시뮬레이션',L,y+116);
+  x.font=`500 28px ${F}`;x.fillText('실제 안전 등급이 아니에요. 맹신하지 마세요.',L,y+158);
+  cardBottom=y+158;
   cv.toBlob(b=>{if(seq!==cardSeq)return;cardBlob=b;$('cardImg').src=URL.createObjectURL(b);$('cardImg').classList.remove('busy')},'image/png');
 }
 $('introChar').innerHTML=charSVG('C');$('scanChar').innerHTML=charSVG('C');
