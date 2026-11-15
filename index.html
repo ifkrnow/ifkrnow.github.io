@@ -158,7 +158,10 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 .place div{display:flex;justify-content:space-between;gap:12px;font-size:15px}.place small{color:var(--sub);white-space:nowrap}
 .note{font-size:13px;color:var(--sub);margin-top:8px}
 .story{margin-top:12px}.story img{width:100%;max-width:100%;aspect-ratio:9/16;border-radius:16px;border:1px solid var(--line);display:block;background:var(--card);transition:opacity .15s}.story img.busy{opacity:.45}
-.row2{display:flex;gap:8px;margin-top:10px}.row2 button{flex:1;min-height:48px;border:1px solid var(--line);border-radius:12px}
+.row2{display:flex;gap:8px;margin-top:10px}.row2 button{flex:1;min-height:52px;border:1px solid var(--line);border-radius:12px;font-weight:700;font-size:15px;background:var(--card)}
+.sharebox{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}.sharebox>b{display:block;font-size:17px;margin-bottom:10px}
+.sharebox .send{width:100%;min-height:58px;border-radius:14px;background:var(--brand);color:#fff;font-weight:800;font-size:18px}
+.sharebox .row2 button{background:var(--bg)}.sharebox .capbtn{width:100%;margin-top:8px;min-height:44px;color:var(--sub);font-size:14px;text-decoration:underline}
 .fix{margin-top:36px;font-size:13px;line-height:1.6;color:var(--sub);border-top:1px solid var(--line);padding-top:16px;display:grid;gap:8px}
 .fix h4{font-size:13px;color:var(--fg);font-weight:700;margin-top:6px}.fix b{color:var(--fg)}.fix .copy{color:var(--dim)}
 .toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:12}
@@ -207,8 +210,12 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 <main id="result" hidden>
   <div class="friend" id="friend" hidden><b>친구가 보낸 결과예요</b>내 동네는 몇 등급일까? 아래 버튼으로 10초 진단</div>
   <div class="story"><img id="cardImg" alt="결과 스토리 카드"></div>
-  <div class="row2"><button id="copyCap">인스타 캡션 복사</button><button id="copyLink">결과 링크 복사</button></div>
-  <p class="note">아래 버튼으로 저장하고, 안 되면 카드를 길게 눌러 사진에 저장하세요.</p>
+  <div class="sharebox" id="shareBox">
+    <b>친구 동네는 몇 등급일까?</b>
+    <button id="sendLink" class="send">친구에게 결과 보내기</button>
+    <div class="row2"><button id="copyLink">링크 복사</button><button id="saveCard">카드 저장·스토리 공유</button></div>
+    <button id="copyCap" class="capbtn">인스타 캡션 복사</button>
+  </div>
 
 
   <h2 id="whyH">왜 이 등급?</h2>
@@ -494,7 +501,7 @@ const WHYX = {
   tsu:r=>R[r][7]<60?['해일에 열린 해안',null]:[null,'바다에서 멂'],
   fire:r=>R[r][8]<55?['넓은 산림·센 바람',null]:[null,'큰 산불이 드문 곳'],
   pand:r=>R[r][5]>=75?['사람이 빽빽함',null]:R[r][5]<45?[null,'인구가 적어 늦게 퍼짐']:[null,null],
-  cyber:r=>R[r][5]>=75?['카드·간편결제 의존이 큼',null]:R[r][4]>=60?[null,'현금·이웃 거래가 남아 있음']:[null,null]
+  cyber:r=>R[r][5]>=75?['카드·간편결제 의존이 큼',null]:R[r][4]>=60?[null,'현금·이웃 거래 가능']:[null,null]
 };
 const FLOOR = ['지하·반지하','1~3층','4~10층','11~20층','21층 이상'];
 const HOME = {
@@ -715,8 +722,8 @@ $('q').oninput=e=>{const q=e.target.value.trim().replace(/(특별|광역)?시$|�
 
 function showResult(){$('input').hidden=true;$('result').hidden=false;document.querySelector('footer').hidden=false; // 안내문은 결과 화면에서만 (입력 단계는 한 화면에)
 $('menu').hidden=false;document.body.classList.add('has-menu'); // 하단 바로 가기 메뉴는 결과 화면에서만
-$('back').hidden=S.shared;$('back').textContent='다시';$('friend').hidden=!S.shared;
-  $('go').classList.remove('wait');$('go').textContent=S.shared?'내 동네도 해보기':'스토리 카드 저장';scrollTo(0,0)}
+$('back').hidden=S.shared;$('back').textContent='다시';$('friend').hidden=!S.shared;$('shareBox').hidden=S.shared;
+  $('go').classList.remove('wait');$('go').textContent=S.shared?'내 동네도 해보기':'친구에게 결과 보내기';scrollTo(0,0)}
 function showInput(){if(S.shared){Object.assign(S,{r:null,c:null,h:null,f:null});document.querySelectorAll('#input .opt').forEach(b=>b.setAttribute('aria-pressed','false'))}
   S.shared=false;$('result').hidden=true;$('input').hidden=false;$('friend').hidden=true;
   try{history.replaceState(null,'',location.pathname+location.search)}catch{}showStep(1)}
@@ -728,7 +735,7 @@ function start(){
 }
 $('go').onclick=()=>{
   if(S.shared){track('friend_try',{from:S.r});showInput();return}
-  if($('result').hidden===false){share();return}
+  if($('result').hidden===false){$('sendLink').click();return}
   const cur=STEP[step-1];if(S[cur.k]===null){toast(cur.msg);return}
   step<4?showStep(step+1):start();
 };
@@ -819,8 +826,8 @@ let cardBlob=null,cardSeq=0;
 async function drawCard(sc,g){
   if($('cardImg').src)$('cardImg').classList.add('busy'); // 새 카드 나올 때까지 이전 카드 흐리게
   const seq=++cardSeq,W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
-  const F=getComputedStyle(document.body).fontFamily,D=`'Black Han Sans',${F}`,v=R[S.r],brand='#ff4b1f',sub='#a59d97',fg='#f6f2ee';
-  try{await document.fonts.load(`80px 'Black Han Sans'`,S.r+g+'너네 동네는 몇 등급?왜등급')}catch{} // 한글은 글자별 묶음으로 나뉘어 받아짐 → 쓸 글자를 넘겨야 다 받는다
+  const F=getComputedStyle(document.body).fontFamily,D=`'Black Han Sans',${F}`,v=R[S.r],brand='#ff4b1f',sub='#c9c1ba',fg='#f6f2ee';
+  try{await document.fonts.load(`80px 'Black Han Sans'`,S.r+g+'우리 동네는 몇 등급?왜등급')}catch{} // 한글은 글자별 묶음으로 나뉘어 받아짐 → 쓸 글자를 넘겨야 다 받는다
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(charSVG(g));
   try{await img.decode()}catch{}
   if(seq!==cardSeq)return; // 그 사이 다른 결과로 바뀌었으면 버린다
@@ -842,23 +849,23 @@ async function drawCard(sc,g){
   x.font=`400 46px ${D}`;x.fillStyle=fg;x.fillText(`왜 ${g}등급?`,L,1078);
   // 양면 해설 한 문장 (최대 3줄로 줄바꿈) — 아래 내용은 줄 수만큼 내려감
   const wrap=(t,maxW)=>{const out=[];let line='';for(const w of t.split(' ')){const s=line?line+' '+w:w;if(x.measureText(s).width>maxW&&line){out.push(line);line=w}else line=s}if(line)out.push(line);return out.slice(0,3)};
-  x.font=`700 34px ${F}`;const ins=wrap(insightOf(S.r,S.c),RX-L-24);
-  x.fillStyle=brand;x.fillRect(L,1104,6,ins.length*46+4);x.fillStyle=fg;ins.forEach((l,i)=>x.fillText(l,L+24,1140+i*46));
-  const off=ins.length*46+30;
+  x.font=`700 38px ${F}`;const ins=wrap(insightOf(S.r,S.c),RX-L-26);
+  x.fillStyle=brand;x.fillRect(L,1104,6,ins.length*54+6);x.fillStyle=fg;ins.forEach((l,i)=>x.fillText(l,L+26,1144+i*54));
+  const off=ins.length*54+30;
   const [bad,good]=whyOf(),CW=(RX-L-40)/2,C2=L+CW+40;
-  x.font=`700 30px ${F}`;x.fillStyle='#ff8a2c';x.fillText('불리한 점',L,1134+off);x.fillStyle=sub;x.fillText('버티는 점',C2,1134+off);
-  x.font=`600 34px ${F}`;x.fillStyle=fg;
-  bad.slice(0,2).forEach((t,i)=>x.fillText(fit('· '+t,CW),L,1186+off+i*48));
-  good.slice(0,2).forEach((t,i)=>x.fillText(fit('· '+t,CW),C2,1186+off+i*48));
+  x.font=`800 34px ${F}`;x.fillStyle='#ff8a2c';x.fillText('불리한 점',L,1140+off);x.fillStyle=sub;x.fillText('버티는 점',C2,1140+off);
+  x.font=`700 37px ${F}`;x.fillStyle=fg;
+  bad.slice(0,2).forEach((t,i)=>x.fillText(fit('· '+t,CW),L,1196+off+i*54));
+  good.slice(0,2).forEach((t,i)=>x.fillText(fit('· '+t,CW),C2,1196+off+i*54));
   // 버틸 구석 · 층 · 가구 점수
   const fl=CRISIS[S.c].fl[S.f],ft=CRISIS[S.c].ft.split('.')[0];
   [['버틸 구석',AX[bestAx()]],[`${FLOOR[S.f]} ${pts(fl)}`,ft],[`${HOME[S.h].name} ${pts(HOME[S.h].adj)}`,HOME[S.h].why]].forEach(([k,t],i)=>{
-    const y=1300+off+i*50;x.font=`700 32px ${F}`;x.fillStyle=i?(String(k).includes('−')?'#ff8a2c':fg):'#ff8a2c';x.fillText(k,L,y);const kw=x.measureText(k+'  ').width;
-    x.font=`500 32px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y)});
-  x.fillStyle='#2e2926';x.fillRect(L,1428+off,RX-L,2);
+    const y=1326+off+i*56;x.font=`800 35px ${F}`;x.fillStyle=i?(String(k).includes('−')?'#ff8a2c':fg):'#ff8a2c';x.fillText(k,L,y);const kw=x.measureText(k+'  ').width;
+    x.font=`600 35px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y)});
+  x.fillStyle='#2e2926';x.fillRect(L,1466+off,RX-L,2);
   // 다른 위기 등급은 일부러 안 보여 줌 → 직접 들어와서 돌려 보게
-  x.font=`400 60px ${D}`;x.fillStyle=fg;x.fillText('너네 동네는 몇 등급?',L,1510+off);
-  x.font=`500 32px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now 프로필 링크 · 공식 등급 아님',L,1562+off);
+  x.font=`400 66px ${D}`;x.fillStyle=fg;x.fillText('우리 동네는 몇 등급?',L,1552+off);
+  x.font=`600 33px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now 프로필 링크 · 공식 등급 아님',L,1606+off);
   cv.toBlob(b=>{if(seq!==cardSeq)return;cardBlob=b;$('cardImg').src=URL.createObjectURL(b);$('cardImg').classList.remove('busy')},'image/png');
 }
 $('introChar').innerHTML=charSVG('C');$('scanChar').innerHTML=charSVG('C');
@@ -871,11 +878,19 @@ async function share(){
 }
 $('copyCap').onclick=async()=>{
   const sc=scoreOf(S.r,S.c,S.h);
-  const t=`${CRISIS[S.c].name} 오면 우리 동네 ${S.r}은 ${gradeOf(sc)}등급, 전국 ${NR}곳 중 ${rankOf(S.r,S.c,S.h,S.f)}위\n너네 동네는 몇 등급? 10초 진단은 @ifkr.now 프로필 링크\n#ifkrnow #내동네위기시뮬레이터 #${CRISIS[S.c].tag} #재난준비 #생존체크리스트`.replace(`${S.r}은`,eun(S.r));
+  const t=`${CRISIS[S.c].name} 오면 우리 동네 ${S.r}은 ${gradeOf(sc)}등급, 전국 ${NR}곳 중 ${rankOf(S.r,S.c,S.h,S.f)}위\n우리 동네는 몇 등급? 10초 진단은 @ifkr.now 프로필 링크\n#ifkrnow #내동네위기시뮬레이터 #${CRISIS[S.c].tag} #재난준비 #생존체크리스트`.replace(`${S.r}은`,eun(S.r));
   track('caption_copy');
   try{await navigator.clipboard.writeText(t);toast('캡션을 복사했어요')}catch{toast('복사가 막혔어요. 길게 눌러 직접 복사해 주세요')}
 };
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1600)}
+$('saveCard').onclick=share;
+$('sendLink').onclick=async()=>{
+  const u=location.origin+location.pathname+'?utm_source=share&utm_medium=send'+hashOf(),g=gradeOf(scoreOf(S.r,S.c,S.h));
+  const t=`${CRISIS[S.c].name} 오면 ${S.r} ${g}등급 나왔어. 우리 동네는 몇 등급?`;
+  track('link_send');
+  try{if(navigator.share){await navigator.share({title:'내 동네 위기 시뮬레이터',text:t,url:u});return}}catch(e){if(e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(t+' '+u);toast('링크를 복사했어요. 카톡에 붙여 넣으세요')}catch{toast('복사가 막혔어요. 주소창 링크를 복사하세요')}
+};
 $('copyLink').onclick=async()=>{
   const u=location.origin+location.pathname+'?utm_source=share&utm_medium=link'+hashOf();
   track('link_copy');
