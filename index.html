@@ -77,22 +77,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .chip[aria-pressed=true]{border-color:var(--fg);color:var(--fg);font-weight:700}
 .detail{margin-top:10px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px}
 .detail .bar:first-child{margin-top:0}
-.rank{list-style:none;border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden}
-.rank li{display:grid;grid-template-columns:30px 1fr 30px 40px;gap:8px;align-items:center;padding:10px 14px;font-size:15px;font-variant-numeric:tabular-nums}
-.rank li+li{border-top:1px solid var(--line)}
-.rank li b{font-family:var(--disp);font-weight:400;font-size:18px;text-align:center}
-.rank li i{font-style:normal;color:var(--dim);font-size:13px}.rank li small{text-align:right;color:var(--sub)}
-.rank li.me{background:#2a1a14}.rank li.me span{font-weight:800;color:var(--brand2)}
-.rank li.gap{display:block;text-align:center;color:var(--dim);padding:4px}
 .more{width:100%;min-height:44px;margin-top:6px;color:var(--sub);font-size:14px}
-.vs{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;display:grid;gap:10px}
-.vs label{font-size:13px;color:var(--sub)}
-.vs select{height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;padding:0 12px}
-.vs table{width:100%;border-collapse:collapse;font-size:15px}
-.vs th{font-size:13px;color:var(--sub);font-weight:600;text-align:center;padding-bottom:6px}.vs th:first-child{text-align:left}
-.vs td{padding:8px 0;border-top:1px solid var(--line);text-align:center}.vs td:first-child{text-align:left;color:var(--sub)}
-.vs td b{font-family:var(--disp);font-weight:400;font-size:20px}.vs td.win b{color:var(--brand2)}
-.vs .sum{font-size:17px;font-weight:800;text-align:center}
 .links{display:grid;gap:8px}
 .links>*{display:block;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px 16px;font-size:14px;color:var(--sub);text-decoration:none}
 .links b{display:block;color:var(--fg);font-size:16px}.links a b::after{content:' ↗';color:var(--dim)}
@@ -179,17 +164,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <h2 id="whyH">왜 이 등급?</h2>
   <div class="why" id="why"></div>
   <div class="detail" id="detail"></div>
-
-  <h2 id="rankH">전국 순위</h2>
-  <ol class="rank" id="rank"></ol>
-  <button class="more" id="rankMore">전체 보기</button>
-
-  <h2>동네 대결</h2>
-  <div class="vs">
-    <label for="vsSel">비교할 동네</label>
-    <select id="vsSel"></select>
-    <div id="vsOut"></div>
-  </div>
 
   <h2>72시간 생존 체크리스트</h2>
   <ul class="check" id="check"></ul>
@@ -553,7 +527,7 @@ function render(){
   chip('chipH',Object.entries(HOME).map(([k,h])=>[k,h.name]),S.h,k=>S.h=k);
   chip('chipF',FLOOR.map((n,i)=>[i,n]),S.f,k=>S.f=k);
   $('detail').innerHTML=bars+`<div class="lines">${lines.slice(1).map(t=>`<p>${t}</p>`).join('')}</div>`;
-  renderRank();renderVS();
+
   const [xb,xg]=WHYX[S.c]?WHYX[S.c](S.r):[null,null];
   const bad=[xb,...WHY[S.r][0].filter(t=>!(xb&&xb.includes('원전')&&t.includes('원전')))].filter(Boolean).slice(0,3),good=[xg,...WHY[S.r][1]].filter(Boolean).slice(0,3),li=a=>a.map(t=>`<li>${t}</li>`).join('');
   $('whyH').textContent=`왜 ${eun(S.r)} ${g}등급?`;
@@ -592,31 +566,6 @@ function renderShop(items){
 }
 $('shopMore').onclick=()=>{shopAll=!shopAll;renderShop(curItems);track('shop_more')};
 
-// 전국 순위: 같은 위기·가구·층 조건에서 40곳 줄 세우기 (기본은 위 5곳 + 내 동네)
-let rankAll=false;
-function renderRank(){
-  const rows=Object.keys(R).map(r=>[r,scoreOf(r,S.c,S.h)]).sort((a,b)=>b[1]-a[1]);
-  $('rankH').textContent=`${CRISIS[S.c].short} 전국 순위 · ${HOME[S.h].name} · ${FLOOR[S.f]}`;
-  const row=([r,s])=>{const rk=1+rows.filter(x=>x[1]>s).length;return `<li class="${r===S.r?'me':''}"><i>${rk}</i><span>${r}</span><b>${gradeOf(s)}</b><small>${s}점</small></li>`};
-  const mine=rows.findIndex(x=>x[0]===S.r);
-  $('rank').innerHTML=rankAll?rows.map(row).join(''):rows.slice(0,5).map(row).join('')+(mine>=5?(mine>5?'<li class="gap">⋯</li>':'')+row(rows[mine]):'');
-  $('rankMore').textContent=rankAll?'접기':`전체 ${NR}곳 보기`;
-}
-$('rankMore').onclick=()=>{rankAll=!rankAll;renderRank();track('rank_all')};
-
-// 동네 대결: 같은 가구·층 조건으로 위기 5종 맞대결
-Object.entries(GROUP).forEach(([g,list])=>{const og=document.createElement('optgroup');og.label=g;
-  list.forEach(r=>{const o=document.createElement('option');o.value=o.textContent=r;og.append(o)});$('vsSel').append(og)});
-function renderVS(){
-  const sel=$('vsSel');if(!sel.dataset.set||sel.value===S.r){sel.value=S.friend&&S.friend!==S.r?S.friend:S.r==='서울'?'부산':'서울'}
-  const o=sel.value;let w=0,l=0;
-  const rows=Object.entries(CRISIS).map(([k,c])=>{const a=scoreOf(S.r,k,S.h),b=scoreOf(o,k,S.h);a>b?w++:a<b&&l++;
-    return `<tr><td>${c.short}</td><td class="${a>b?'win':''}"><b>${gradeOf(a)}</b> ${a}</td><td class="${b>a?'win':''}"><b>${gradeOf(b)}</b> ${b}</td></tr>`}).join('');
-  const d=Object.keys(CRISIS).length-w-l;
-  $('vsOut').innerHTML=`<table><tr><th></th><th>${S.r}</th><th>${o}${S.friend===o?' (친구)':''}</th></tr>${rows}</table>
-    <p class="sum">${w>l?`${S.r} 승`:w<l?`${o} 승`:'무승부'} · ${w}승 ${d}무 ${l}패</p><p class="note">${HOME[S.h].name} · ${FLOOR[S.f]} 같은 조건으로 비교</p>`;
-}
-$('vsSel').onchange=()=>{$('vsSel').dataset.set=1;renderVS();track('battle',{a:S.r,b:$('vsSel').value})};
 
 // IF 대한민국 하얀 캐릭터: 주황 과녁 원판 + 얼굴 표정이 등급을 말한다 (옷 없음)
 function charSVG(g){
