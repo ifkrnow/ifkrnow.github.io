@@ -82,6 +82,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .shrow{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:12px 14px;display:grid;gap:8px}
 .shrow b{display:block;font-size:15px}.shrow span{display:block;font-size:13px;color:var(--sub)}
 .shrow .act{display:flex;gap:6px}.shrow .act a{flex:1;text-align:center;min-height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--fg);text-decoration:none}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+.grid5 .opt{min-height:38px;padding:5px 2px;font-size:14px}
+#input .intro{grid-template-columns:1fr 80px;margin-top:6px}
+#input h1{font-size:24px}
+#input .tease{margin-top:4px;font-size:14px}
+#input .search{height:44px}
+@media (max-height:740px){#input .intro{display:none}#input .tease{margin-top:10px;font-size:15px}#st1>.note:last-child{display:none}} /* 낮은 폰: 1단계도 한 화면에 */
 .stepbar{margin-top:14px;display:grid;gap:10px}
 .stepbar .dots{display:flex;align-items:center;gap:6px}
 .stepbar .dots i{width:22px;height:4px;border-radius:2px;background:var(--line)}.stepbar .dots i.done{background:var(--sub)}.stepbar .dots i.on{background:var(--brand);width:34px}
@@ -143,8 +150,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <div><h1>당신의 동네는,<br>버틸 수 있을까?</h1></div>
       <div id="introChar" aria-hidden="true"></div>
     </div>
-    <p class="lead">4가지만 고르면 10초 안에 등급이 나옵니다.</p>
-    <p class="tease">전국 40곳 중 S등급이 나오는 곳은 단 한 곳. 우리 동네는?</p>
+    <p class="tease">전국 40곳 중 S등급은 단 한 곳. 우리 동네는?</p>
   </div>
   <!-- 한 번에 한 단계씩: 1 사는 곳 → 2 위기 → 3 누구와 → 4 층 -->
   <div class="stepbar" id="stepbar"></div>
@@ -567,16 +573,16 @@ function renderBar(){
     (step>1?`<div class="picked">${STEP.slice(0,step-1).map((s,i)=>`<button data-go="${i+1}">${esc(label(s.k))}</button>`).join('<b>›</b>')}</div>`:'');
   $('stepbar').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>showStep(+b.dataset.go)); // 고른 것을 누르면 그 단계로 돌아감
 }
-function showStep(n){step=n;[1,2,3,4].forEach(i=>$('st'+i).hidden=i!==n);$('introBox').hidden=n>1;renderBar();updateCTA();scrollTo(0,0)}
+function showStep(n){step=n;[1,2,3,4].forEach(i=>$('st'+i).hidden=i!==n);$('introBox').hidden=n>1;document.querySelector('footer').hidden=true;renderBar();updateCTA();scrollTo(0,0)}
 function updateCTA(){if(!$('result').hidden)return;const cur=STEP[step-1],ok=S[cur.k]!==null;
   $('go').classList.toggle('wait',!ok);$('go').textContent=!ok?cur.msg:step<4?'다음':'10초 진단 시작';
   $('back').hidden=step===1;$('back').textContent='이전'}
 function pick(box,btn,adv=true){box.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===btn));updateCTA();
   if(adv)setTimeout(()=>step<4?showStep(step+1):start(),220)} // 살짝 눌린 걸 보여 준 뒤 넘어감
 
-Object.entries(GROUP).forEach(([gname,list])=>{const sec=document.createElement('div');sec.className='grp';sec.innerHTML=`<h3>${gname}</h3>`;
-  const grid=document.createElement('div');grid.className='grid';
-  list.forEach(r=>{const b=opt(r,'',()=>{S.r=r;pick($('regions'),b)});b.dataset.r=r;grid.append(b)});sec.append(grid);$('regions').append(sec)});
+// 한 화면에 다 들어오게 권역 머리글 없이 5칸 격자 (순서는 권역 순 그대로, 찾기는 검색창으로)
+{const grid=document.createElement('div');grid.className='grid5';
+  Object.values(GROUP).flat().forEach(r=>{const b=opt(r,'',()=>{S.r=r;pick($('regions'),b)});b.dataset.r=r;grid.append(b)});$('regions').append(grid)}
 Object.entries(CRISIS).forEach(([k,c])=>{const b=opt(c.name,c.d,()=>{S.c=k;pick($('crises'),b)});$('crises').append(b)});
 Object.entries(HOME).forEach(([k,h])=>{const b=opt(h.name,h.d,()=>{S.h=k;pick($('homes'),b)});$('homes').append(b)});
 FLOOR.forEach((n,i)=>{const b=opt(n,'',()=>{S.f=i;pick($('floors'),b)});$('floors').append(b)});
@@ -592,7 +598,8 @@ $('q').oninput=e=>{const q=e.target.value.trim().replace(/(특별|광역)?시$|�
   if(q&&shown.length===1&&S.r!==shown[0].dataset.r){S.r=shown[0].dataset.r;pick($('regions'),shown[0],false)} // 하나만 남으면 바로 선택(타이핑 중이라 스크롤은 안 함)
 };
 
-function showResult(){$('input').hidden=true;$('result').hidden=false;$('back').hidden=S.shared;$('back').textContent='다시';$('friend').hidden=!S.shared;
+function showResult(){$('input').hidden=true;$('result').hidden=false;document.querySelector('footer').hidden=false; // 안내문은 결과 화면에서만 (입력 단계는 한 화면에)
+$('back').hidden=S.shared;$('back').textContent='다시';$('friend').hidden=!S.shared;
   $('go').classList.remove('wait');$('go').textContent=S.shared?'내 동네도 해보기':'스토리 카드 저장';scrollTo(0,0)}
 function showInput(){if(S.shared){Object.assign(S,{r:null,c:null,h:null,f:null});document.querySelectorAll('#input .opt').forEach(b=>b.setAttribute('aria-pressed','false'))}
   S.shared=false;$('result').hidden=true;$('input').hidden=false;$('friend').hidden=true;
@@ -610,7 +617,7 @@ $('go').onclick=()=>{
   step<4?showStep(step+1):start();
 };
 $('back').onclick=()=>$('result').hidden?showStep(Math.max(1,step-1)):showInput();
-renderBar();updateCTA();
+renderBar();updateCTA();document.querySelector('footer').hidden=true;
 
 function analysis(){
   const v=R[S.r],c=CRISIS[S.c];
