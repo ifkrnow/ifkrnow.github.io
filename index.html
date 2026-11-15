@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>내 동네 위기 시뮬레이터 · ifkr.now</title>
 <meta name="description" content="사는 곳·위기·가구·층수 4가지만 고르면 10초 안에 동네 위기 등급(S~D)과 대피소·생존 물품까지">
-<meta property="og:title" content="내 동네는 몇 등급? 위기 시뮬레이터">
+<meta property="og:title" content="만약 전쟁 나면, 우리 동네는 몇 등급?">
 <meta property="og:description" content="전쟁·폭격·정전·지진·독가스, 우리 집은 버틸 수 있을까? 전국 43곳 10초 진단">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ifkrnow.github.io/">
-<meta property="og:image" content="https://ifkrnow.github.io/og.jpg">
+<meta property="og:image" content="https://ifkrnow.github.io/og.jpg?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="전쟁 나면, 우리 동네는 몇 등급? 내 동네 위기 시뮬레이터">
+<meta property="og:image:alt" content="만약 전쟁 나면, 우리 동네는 몇 등급? 내 동네 위기 시뮬레이터">
 <meta property="og:site_name" content="ifkr.now">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://ifkrnow.github.io/og.jpg">
+<meta name="twitter:image" content="https://ifkrnow.github.io/og.jpg?v=2">
 <!-- GA4: ifkr.now 위기 시뮬레이터 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-S9VCF1ZB19"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-S9VCF1ZB19');</script>
@@ -556,7 +556,10 @@ const INSIGHT = {
 };
 const MILC = new Set(['war','apt','gas']); // 군사형 해설을 쓰는 위기
 // 원전·지진·해일·산불·감염병은 군사/생활 해설이 안 맞아서 그 위기 전용 지역 문장을 쓴다
-const insightOf = (r,c) => MILC.has(c)?INSIGHT[r][0]:c==='out'?INSIGHT[r][1]:noteOf(r,c);
+// 멘트는 모두 가정으로: 「만약 ○○이라면,」으로 시작 (11/16 사용자 — 예측처럼 들리지 않게)
+const IFW={war:'공습이라면',apt:'폭격이라면',out:'정전이라면',quake:'지진이라면',gas:'독가스라면',nuke:'원전 사고라면',tsu:'해일이라면',fire:'산불이라면',pand:'감염병이라면',cyber:'통신 마비라면'};
+const baseInsight = (r,c) => MILC.has(c)?INSIGHT[r][0]:noteOf(r,c); // 정전은 지역 정전 문장(NOTE)이 「만약 정전이라면」 뒤에 자연스러움
+const insightOf = (r,c) => `만약 ${IFW[c]}, ${baseInsight(r,c)}`;
 const GROUP = {수도권:['서울','인천','수원','성남','고양','부천','안산','의정부','김포','파주','동두천','연천','평택','안성'],
   충청:['대전','세종','청주','천안','논산'], 호남:['광주','전주','군산','순천','여수','목포','진도'],
   영남:['부산','대구','울산','창원','진해','김해','거제','포항','경주'], '강원·제주·섬':['춘천','원주','강릉','영월','철원','양구','제주','울릉도']};
@@ -899,7 +902,7 @@ renderBar();updateCTA();document.querySelector('footer').hidden=true;
 function analysis(){
   const c=CRISIS[S.c];
   const fa=c.fl[S.f];
-  return [noteOf(S.r,S.c)===insightOf(S.r,S.c)?null:noteOf(S.r,S.c),
+  return [noteOf(S.r,S.c)===baseInsight(S.r,S.c)?null:noteOf(S.r,S.c),
     `${FLOOR[S.f]} ${fa>0?'+':fa<0?'−':'±'}${Math.abs(fa)}점. ${c.ft}`, `${HOME[S.h].line} ${c.hint}`];
 }
 
@@ -1001,9 +1004,11 @@ async function drawCard(sc,g){
   // 왜 이 등급? — 양면 해설(최대 3줄) → 불리한 점 2 → 버티는 점 2 → 주요 시설·층·가구
   x.font=`400 46px ${D}`;x.fillStyle=fg;x.fillText(`왜 ${g}등급?`,L,1026);
   const wrap=(t,maxW)=>{const out=[];let line='';for(const w of t.split(' ')){const s=line?line+' '+w:w;if(x.measureText(s).width>maxW&&line){out.push(line);line=w}else line=s}if(line)out.push(line);return out.slice(0,3)};
-  x.font=`700 37px ${F}`;const ins=wrap(insightOf(S.r,S.c),RX-L-26);
-  x.fillStyle=brand;x.fillRect(L,1052,6,ins.length*52+4);x.fillStyle=fg;ins.forEach((l,i)=>x.fillText(l,L+26,1090+i*52));
-  let y=1090+(ins.length-1)*52+74;const KW=170;
+  // 「만약 ○○이라면,」이 붙어 길어진 해설이 3줄이 되면 글자를 줄여 2줄로 (카드 아래가 스토리 버튼에 가리지 않게)
+  let fs=37;x.font=`700 ${fs}px ${F}`;let ins=wrap(insightOf(S.r,S.c),RX-L-26);
+  while(ins.length>2&&fs>31){fs-=2;x.font=`700 ${fs}px ${F}`;ins=wrap(insightOf(S.r,S.c),RX-L-26)}
+  const lh=Math.round(fs*1.4);x.fillStyle=brand;x.fillRect(L,1052,6,ins.length*lh+4);x.fillStyle=fg;ins.forEach((l,i)=>x.fillText(l,L+26,1090+i*lh));
+  let y=1090+(ins.length-1)*lh+74;const KW=170;
   const [bad,good]=whyOf();
   const group=(label,col,items)=>{items.slice(0,2).forEach((t,i)=>{if(!i){x.font=`800 34px ${F}`;x.fillStyle=col;x.fillText(label,L,y)}
     x.font=`700 36px ${F}`;x.fillStyle=fg;x.fillText(fit(t,RX-L-KW),L+KW,y);y+=52});if(items.length)y+=16};
