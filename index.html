@@ -648,8 +648,8 @@ const whyOf=()=>{let [xb,xg]=WHYX[S.c]?WHYX[S.c](S.r):[null,null];
   for(const [k,v] of ax)if(bad.length<2&&v<50&&!own(k))bad.push(`${S.r} ${WEAK[k]}, ${rk(k)}`);
   for(const [k,v] of [...ax].reverse())if(good.length<2&&v>=60&&!own(k))good.push(`${S.r} ${GOODS[k]}, ${rk(k)}`);
   const lo=ax.filter(([k])=>!own(k));
-  if(!bad.length)bad.push(`${S.r}의 가장 약한 ${AX[lo[0][0]]}도 ${rk(lo[0][0])}`);
-  if(!good.length)good.push(`${S.r}의 가장 나은 ${AX[lo.at(-1)[0]]}도 ${rk(lo.at(-1)[0])}`);
+  if(!bad.length)bad.push(`${S.r} 약점 ${AX[lo[0][0]]}도 ${rk(lo[0][0])}`);
+  if(!good.length)good.push(`${S.r} 강점 ${AX[lo.at(-1)[0]]}도 ${rk(lo.at(-1)[0])}`);
   return [bad,good]};
 const WEAK={war:'표적과 가까움',infra:'복구가 늦은 편',terrain:'지반·배수 약함',shelter:'지하 대피 공간 부족',iso:'외부 지원이 늦음',load:'사람 많아 물자 경쟁'};
 const GOODS={war:'표적과 거리 있음',infra:'전기·물 복구 빠름',terrain:'지반·배수 안정',shelter:'지하 대피 공간 넉넉',iso:'외부 지원이 빠름',load:'사람이 덜 몰림'};
@@ -994,42 +994,52 @@ async function drawCard(sc,g){
   // 너무 긴 글은 폭에 맞춰 … 처리 (오른쪽 935px 넘지 않게)
   const fit=(t,maxW)=>{if(x.measureText(t).width<=maxW)return t;while(t.length>1&&x.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t+'…'};
   const L=96,RX=935;
-  x.font=`700 34px ${F}`;x.fillStyle=brand;x.fillText('내 동네 위기 시뮬레이터',L,330);
-  x.font=`500 25px ${F}`;x.fillStyle=sub;x.textAlign='right';x.fillText('재미로 보는 시뮬레이션 · 맹신 금물',RX,330);x.textAlign='left';
-  x.fillStyle=fg;x.font=`400 104px ${D}`;x.fillText(S.r,L,436);
-  x.font=`600 38px ${F}`;x.fillStyle=sub;x.fillText(`${CRISIS[S.c].name} · ${HOME[S.h].name} · ${FLOOR[S.f]}`,L,496);
-  x.drawImage(img,630,520,290,290);
-  x.fillStyle=fg;x.font=`400 320px ${D}`;x.fillText(g,84,800);
-  x.font=`600 44px ${F}`;x.fillStyle=sub;x.fillText('안전점수',L,876);x.fillStyle=fg;x.font=`800 48px ${F}`;x.fillText(`${sc} / 100`,290,876);
-  x.font=`600 38px ${F}`;x.fillStyle=sub;const rt=`같은 조건 ${NR}곳 중 `;x.fillText(rt,L,930);const w=x.measureText(rt).width;
-  x.fillStyle='#ff8a2c';x.font=`800 38px ${F}`;x.fillText(`${rankOf(S.r,S.c,S.h,S.f)}위`,L+w,930);
-  x.fillStyle='#2e2926';x.fillRect(L,962,RX-L,2);
-  // 왜 이 등급? — 양면 해설(최대 3줄) → 불리한 점 2 → 버티는 점 2 → 주요 시설·층·가구
-  x.font=`400 46px ${D}`;x.fillStyle=fg;x.fillText(`왜 ${g}등급?`,L,1026);
-  const wrap=(t,maxW)=>{const out=[];let line='';for(const w of t.split(' ')){const s=line?line+' '+w:w;if(x.measureText(s).width>maxW&&line){out.push(line);line=w}else line=s}if(line)out.push(line);return out.slice(0,3)};
-  // 「만약 ○○이라면,」이 붙어 길어진 해설이 3줄이 되면 글자를 줄여 2줄로 (카드 아래가 스토리 버튼에 가리지 않게)
-  let fs=37;x.font=`700 ${fs}px ${F}`;let ins=wrap(insightOf(S.r,S.c),RX-L-26);
-  while(ins.length>2&&fs>31){fs-=2;x.font=`700 ${fs}px ${F}`;ins=wrap(insightOf(S.r,S.c),RX-L-26)}
-  const lh=Math.round(fs*1.4);x.fillStyle=brand;x.fillRect(L,1052,6,ins.length*lh+4);x.fillStyle=fg;ins.forEach((l,i)=>x.fillText(l,L+26,1090+i*lh));
-  let y=1090+(ins.length-1)*lh+74;const KW=170;
+  x.font=`700 34px ${F}`;x.fillStyle=brand;x.fillText('내 동네 위기 시뮬레이터',L,300);
+  x.font=`500 25px ${F}`;x.fillStyle=sub;x.textAlign='right';x.fillText('재미로 보는 시뮬레이션 · 맹신 금물',RX,300);x.textAlign='left';
+  x.fillStyle=fg;x.font=`400 104px ${D}`;x.fillText(S.r,L,406);
+  x.font=`600 38px ${F}`;x.fillStyle=sub;x.fillText(`${CRISIS[S.c].name} · ${HOME[S.h].name} · ${FLOOR[S.f]}`,L,466);
+  x.drawImage(img,630,490,290,290);
+  x.fillStyle=fg;x.font=`400 320px ${D}`;x.fillText(g,84,770);
+  // 점수 + 순위 한 줄
+  x.font=`600 42px ${F}`;x.fillStyle=sub;x.fillText('안전점수',L,842);const sw=x.measureText('안전점수  ').width;
+  x.fillStyle=fg;x.font=`800 50px ${F}`;x.fillText(`${sc}`,L+sw,842);const nw=x.measureText(`${sc}`).width;x.font=`600 34px ${F}`;x.fillStyle=sub;x.fillText(' / 100',L+sw+nw,842);
+  x.textAlign='right';x.font=`800 38px ${F}`;x.fillStyle='#ff8a2c';const rk=`${rankOf(S.r,S.c,S.h,S.f)}위`;x.fillText(rk,RX,842);const rw=x.measureText(rk).width;
+  x.font=`600 34px ${F}`;x.fillStyle=sub;x.fillText(`같은 조건 ${NR}곳 중 `,RX-rw,842);x.textAlign='left';
+  // 점수 막대: D(~35)·C·B·A·S(80~) 구간 + 내 위치
+  const gy=870,gh=16,gw=RX-L,px=v=>L+gw*Math.max(0,Math.min(100,v))/100;
+  x.fillStyle='#2e2926';x.beginPath();x.roundRect(L,gy,gw,gh,8);x.fill();
+  x.fillStyle=fg;x.beginPath();x.roundRect(L,gy,Math.max(gh,px(sc)-L),gh,8);x.fill();
+  x.fillStyle='#0f0d0c';[35,50,65,80].forEach(v=>x.fillRect(px(v)-2,gy,4,gh));
+  x.font=`700 24px ${F}`;x.textAlign='center';[['D',0,35],['C',35,50],['B',50,65],['A',65,80],['S',80,100]].forEach(([k,a,b])=>{x.fillStyle=k===g?fg:'#6f6762';x.font=`${k===g?800:600} ${k===g?28:24}px ${F}`;x.fillText(k,(px(a)+px(b))/2,gy+gh+34)});x.textAlign='left';
+  x.fillStyle='#2e2926';x.fillRect(L,952,RX-L,2);
+  // 왜 이 등급? — 「만약 ○○이라면,」은 주황, 「~지만,」 뒤 핵심은 노랑 + 밑줄
+  x.font=`400 46px ${D}`;x.fillStyle=fg;x.fillText(`왜 ${g}등급?`,L,1016);
+  const words=insightOf(S.r,S.c).split(' ');let pre=words.findIndex(w=>w.endsWith(','));const tw0=words.findIndex(w=>/지만,$/.test(w));
+  const tok=words.map((w,k)=>({w,c:k<=pre?'#ff8a2c':(tw0>=0&&k>tw0)?'#FFD23F':fg,u:tw0>=0&&k>tw0}));
+  const layout=fs=>{x.font=`700 ${fs}px ${F}`;const sp=x.measureText(' ').width,lines=[[]];let cw=0;tok.forEach(t=>{const ww=x.measureText(t.w).width;if(cw&&cw+sp+ww>RX-L-26){lines.push([]);cw=0}lines.at(-1).push({...t,ww});cw+=(cw?sp:0)+ww});return {lines,sp}};
+  let fs=37,lay=layout(fs);while(lay.lines.length>2&&fs>31){fs-=2;lay=layout(fs)}
+  const lh=Math.round(fs*1.45);x.fillStyle=brand;x.fillRect(L,1042,6,lay.lines.length*lh+4);
+  lay.lines.forEach((ln,li)=>{let cx=L+26;const by=1080+li*lh;ln.forEach((t,ti)=>{x.fillStyle=t.c;x.fillText(t.w,cx,by);
+    if(t.u){const nx=ti+1<ln.length&&ln[ti+1].u?lay.sp:0;x.fillStyle='#FFD23F';x.fillRect(cx,by+8,t.ww+nx,3)}cx+=t.ww+lay.sp})});
+  let y=1080+(lay.lines.length-1)*lh+74;const KW=170;
   const [bad,good]=whyOf();
-  const group=(label,col,items)=>{items.slice(0,2).forEach((t,i)=>{if(!i){x.font=`800 34px ${F}`;x.fillStyle=col;x.fillText(label,L,y)}
-    x.font=`700 36px ${F}`;x.fillStyle=fg;x.fillText(fit(t,RX-L-KW),L+KW,y);y+=52});if(items.length)y+=16};
-  group('불리한 점','#ff8a2c',bad);group('버티는 점',sub,good);
+  const group=(label,col,mark,mc,items)=>{items.slice(0,2).forEach((t,i)=>{if(!i){x.font=`800 34px ${F}`;x.fillStyle=col;x.fillText(label,L,y)}
+    x.font=`800 36px ${F}`;x.fillStyle=mc;x.fillText(mark,L+KW,y);x.font=`700 36px ${F}`;x.fillStyle=fg;x.fillText(fit(t,RX-L-KW-34),L+KW+34,y);y+=50});if(items.length)y+=16};
+  group('불리한 점','#ff8a2c','−','#ff8a2c',bad);group('버티는 점',fg,'+','#8fd6a0',good);
   // 주요 시설은 통째로 들어가는 것만 이어 붙임 (중간에 잘리지 않게)
   x.font=`600 34px ${F}`;let fac='';for(const k of FAC[S.r].k){const t=fac?fac+' · '+k:k;if(x.measureText(t).width>RX-L-KW)break;fac=t}
   const fl=CRISIS[S.c].fl[S.f],ft=CRISIS[S.c].ft.split('.')[0];
   [['주요 시설',fac,sub],[`${FLOOR[S.f]} ${pts(fl)}`,ft,fl<0?'#ff8a2c':fg],[`${HOME[S.h].name} ${pts(HOME[S.h].adj)}`,HOME[S.h].why,HOME[S.h].adj<0?'#ff8a2c':fg]].forEach(([k,t,col])=>{
     x.font=`800 34px ${F}`;x.fillStyle=col;x.fillText(k,L,y);const kw=Math.max(KW,x.measureText(k+'  ').width);
-    x.font=`600 34px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y);y+=52});
+    x.font=`600 34px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y);y+=50});
   x.fillStyle='#2e2926';x.fillRect(L,y-14,RX-L,2);
   // 다른 위기 등급은 일부러 안 보여 줌 → 직접 들어와서 돌려 보게
   x.font=`400 62px ${D}`;x.fillStyle=fg;x.fillText('우리 동네는 몇 등급?',L,y+60);
   // 인스타 유도: 흰 테두리 상자(색 배지 아님) 안에 @ifkr.now
-  const bx=y+84,bh=78;x.strokeStyle=fg;x.lineWidth=3;x.beginPath();x.roundRect(L,bx,RX-L,bh,18);x.stroke();
+  const bx=y+78,bh=70;x.strokeStyle=fg;x.lineWidth=3;x.beginPath();x.roundRect(L,bx,RX-L,bh,18);x.stroke();
   const parts=[['인스타 ',`800 37px ${F}`,fg],['@ifkr.now',`800 37px ${F}`,'#ff8a2c'],[' 팔로우 · 다른 위기 영상',`700 34px ${F}`,fg]];
   const tw=parts.reduce((a,[t,f])=>{x.font=f;return a+x.measureText(t).width},0);let tx=L+(RX-L-tw)/2;
-  parts.forEach(([t,f,c])=>{x.font=f;x.fillStyle=c;x.fillText(t,tx,bx+52);tx+=x.measureText(t).width});
+  parts.forEach(([t,f,c])=>{x.font=f;x.fillStyle=c;x.fillText(t,tx,bx+48);tx+=x.measureText(t).width});
   cardBottom=bx+bh;
   cv.toBlob(b=>{if(seq!==cardSeq)return;cardBlob=b;$('cardImg').src=URL.createObjectURL(b);$('cardImg').classList.remove('busy')},'image/png');
 }
