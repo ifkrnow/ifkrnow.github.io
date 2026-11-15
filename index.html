@@ -82,6 +82,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .shrow{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:12px 14px;display:grid;gap:8px}
 .shrow b{display:block;font-size:15px}.shrow span{display:block;font-size:13px;color:var(--sub)}
 .shrow .act{display:flex;gap:6px}.shrow .act a{flex:1;text-align:center;min-height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--fg);text-decoration:none}
+.stepbar{margin-top:14px;display:grid;gap:10px}
+.stepbar .dots{display:flex;align-items:center;gap:6px}
+.stepbar .dots i{width:22px;height:4px;border-radius:2px;background:var(--line)}.stepbar .dots i.done{background:var(--sub)}.stepbar .dots i.on{background:var(--brand);width:34px}
+.stepbar .dots span{margin-left:auto;font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
+.stepbar .picked{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.stepbar .picked button{min-height:34px;padding:0 12px;border:1px solid var(--line);border-radius:17px;font-size:14px;font-weight:700}
+.stepbar .picked b{color:var(--dim);font-weight:400}
+.step h2{margin-top:18px}
 .grp+.grp{margin-top:14px}.grp h3{font-size:13px;font-weight:600;color:var(--dim);letter-spacing:.04em}
 .why{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .why>div{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;min-width:0}
@@ -90,13 +98,21 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .why ul{list-style:none;display:grid;gap:4px;font-size:15px}.why li::before{content:'· ';color:var(--dim)}
 .why p{grid-column:1/-1;font-size:13px;color:var(--sub)}
 .check{list-style:none;display:grid;gap:6px}
-.check li button{width:100%;min-height:48px;display:flex;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px 14px;font-size:15px}
-.check li button::before{content:'';flex:none;width:20px;height:20px;border:2px solid var(--dim);border-radius:6px}
-.check li button[aria-pressed=true]{color:var(--dim);text-decoration:line-through}
-.check li button[aria-pressed=true]::before{background:var(--brand);border-color:var(--brand)}
-.check li{display:flex;gap:6px;align-items:stretch}.check li button{flex:1;min-width:0}
+.check li{border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.check .row{display:flex;align-items:stretch}
+.check .box{flex:none;width:50px;min-height:48px;display:flex;align-items:center;justify-content:center}
+.check .box::before{content:"";width:20px;height:20px;border:2px solid var(--dim);border-radius:6px}
+.check .box[aria-pressed=true]::before{background:var(--brand);border-color:var(--brand)}
+.check .txt{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:10px 14px 10px 0;font-size:15px}
+.check .txt::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--dim);border-bottom:2px solid var(--dim);transform:rotate(45deg) translateY(-3px);transition:transform .15s}
+.check .txt[aria-expanded=true]::after{transform:rotate(-135deg) translateY(-2px)}
+.check li.done .txt{color:var(--dim);text-decoration:line-through}
+.check .dt{padding:0 14px 14px 50px;display:grid;gap:8px;font-size:14px;color:var(--sub);line-height:1.55}
+.check .dt b{display:block;color:var(--fg);font-size:13px;margin-bottom:2px}
 .buy{display:flex;align-items:center;justify-content:center;flex:none;padding:0 12px;min-height:44px;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--sub);text-decoration:none}
-.buy::after{content:' ↗';color:var(--dim);margin-left:2px}
+.check .dt .buy{background:var(--brand);border-color:var(--brand);color:#fff;font-size:15px;font-weight:700;min-height:46px}
+.buy::after{content:" ↗";color:var(--dim);margin-left:2px}
+.check .dt .buy::after{color:#fff}
 .shop{display:grid;gap:6px}
 .shoprow{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:10px 10px 10px 14px}
 .shoprow>div{flex:1;min-width:0}.shoprow b{display:block;font-size:15px}.shoprow span{display:block;font-size:13px;color:var(--sub)}
@@ -122,27 +138,36 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <header><div class="brand">ifkr<b>.</b>now<small>내 동네 위기 시뮬레이터</small></div></header>
 
 <main id="input">
-  <div class="intro">
-    <div><h1>당신의 동네는,<br>버틸 수 있을까?</h1></div>
-    <div id="introChar" aria-hidden="true"></div>
+  <div id="introBox">
+    <div class="intro">
+      <div><h1>당신의 동네는,<br>버틸 수 있을까?</h1></div>
+      <div id="introChar" aria-hidden="true"></div>
+    </div>
+    <p class="lead">4가지만 고르면 10초 안에 등급이 나옵니다.</p>
+    <p class="tease">전국 40곳 중 S등급이 나오는 곳은 단 한 곳. 우리 동네는?</p>
   </div>
-  <p class="lead">4가지만 고르면 10초 안에 등급이 나옵니다.</p>
-  <p class="tease">전국 40곳 중 S등급이 나오는 곳은 단 한 곳. 우리 동네는?</p>
+  <!-- 한 번에 한 단계씩: 1 사는 곳 → 2 위기 → 3 누구와 → 4 층 -->
+  <div class="stepbar" id="stepbar"></div>
 
-  <h2 id="s1"><em>1</em>사는 곳</h2>
-  <input class="search" id="q" type="search" placeholder="지역 검색 (예: 평택)" autocomplete="off" aria-label="지역 검색">
-  <p class="note" id="qhint" hidden></p>
-  <div id="regions"></div>
-  <p class="note">우리 동네가 없나요? 가까운 곳을 고르고, <b>@ifkr.now</b> 댓글로 알려주시면 추가할게요.</p>
-
-  <h2 id="s2"><em>2</em>어떤 위기</h2>
-  <div class="rows two" id="crises"></div>
-
-  <h2 id="s3"><em>3</em>누구와</h2>
-  <div class="rows two" id="homes"></div>
-
-  <h2 id="s4"><em>4</em>몇 층에 사나요</h2>
-  <div class="rows" id="floors"></div>
+  <section class="step" id="st1">
+    <h2 id="s1"><em>1</em>사는 곳</h2>
+    <input class="search" id="q" type="search" placeholder="지역 검색 (예: 평택)" autocomplete="off" aria-label="지역 검색">
+    <p class="note" id="qhint" hidden></p>
+    <div id="regions"></div>
+    <p class="note">우리 동네가 없나요? 가까운 곳을 고르고, <b>@ifkr.now</b> 댓글로 알려주시면 추가할게요.</p>
+  </section>
+  <section class="step" id="st2" hidden>
+    <h2 id="s2"><em>2</em>어떤 위기</h2>
+    <div class="rows two" id="crises"></div>
+  </section>
+  <section class="step" id="st3" hidden>
+    <h2 id="s3"><em>3</em>누구와</h2>
+    <div class="rows two" id="homes"></div>
+  </section>
+  <section class="step" id="st4" hidden>
+    <h2 id="s4"><em>4</em>몇 층에 사나요</h2>
+    <div class="rows" id="floors"></div>
+  </section>
 </main>
 
 <main id="result" hidden>
@@ -449,6 +474,77 @@ const COUPANG = {
   '사료 · 물 3일치':{kw:'사료 소포장',url:'https://link.coupang.com/a/iHsy0zKTbE'}
 };
 const shopUrl=t=>{const p=COUPANG[t];return p&&(p.url||'https://www.coupang.com/np/search?q='+encodeURIComponent(p.kw))};
+// 체크리스트 항목을 누르면 펼쳐지는 설명: [무엇을 준비하나(살 것 없으면 ''), 왜 필요한가]
+const DETAIL = {
+  '물 1인 하루 3L × 3일치':['2L 생수 묶음 (한 사람당 5병 정도)','단수되면 마실 물과 최소한의 씻을 물이 가장 먼저 끊겨요. 1인 하루 3L, 72시간 기준이에요.'],
+  '휴대용 라디오 · 보조배터리':['건전지나 손잡이로 충전되는 재난용 라디오, 1만mAh 이상 보조배터리','통신과 전기가 끊겨도 라디오로 재난방송을 들을 수 있어요. 휴대폰은 재난문자와 연락용으로 아껴 써야 해요.'],
+  '현금 소액 (카드 결제 멈춤 대비)':['','정전이나 통신 장애가 나면 카드와 간편결제가 멈춰요. 천 원·만 원권을 섞어 10만 원 정도 두세요.'],
+  '상비약 · 처방약 7일치':['소독약·밴드·진통제·해열제가 든 구급함, 먹는 약 7일분','병원과 약국이 문을 닫거나 가기 어려워질 수 있어요.'],
+  '가족 연락처를 종이에 적어 두기':['','휴대폰이 꺼지면 외우고 있는 번호가 거의 없어요. 지갑에 넣을 수 있는 크기로 적어 두세요.'],
+  '가까운 대피소 위치 미리 확인':['','경보가 울리면 몇 분 안에 움직여야 해요. 아래 "우리 동네 대피소 찾기"에서 집·회사 근처 두 곳을 봐 두세요.'],
+  '마스크 · 젖은 수건 (연기·분진)':['KF94 마스크 (가족 수만큼)','폭발이나 화재 뒤에는 연기와 분진이 퍼져요. 덜 마시는 것만으로도 버티는 시간이 늘어요.'],
+  '손전등 · 여분 건전지':['LED 손전등과 맞는 건전지','지하 대피소와 계단은 정전되면 앞이 안 보여요. 휴대폰 불빛은 배터리를 빨리 써요.'],
+  '차량 연료 절반 이상 유지':['','대피 명령이 나면 주유소에 줄이 길어지고 문을 닫기도 해요.'],
+  '조리 없이 먹는 비상식량 3일치':['데우지 않고 먹는 비상식량·통조림·에너지바 3일분','대피소에선 불을 쓰기 어렵고, 배급이 시작되기까지 시간이 걸릴 수 있어요.'],
+  '랜턴 (촛불 대신, 화재 예방)':['세워 둘 수 있는 LED 랜턴','정전 때 켠 촛불이 불이 나는 원인이 되는 경우가 많아요.'],
+  '휴대용 버너 · 가스':['휴대용 가스버너와 부탄가스 3~4개','전기레인지와 보일러가 멈추면 물도 못 끓여요. 실내에서 쓸 땐 꼭 환기하세요.'],
+  '욕조·통에 생활용수 받아 두기':['','아파트는 정전되면 물을 끌어올리는 펌프가 멈춰 수돗물이 끊겨요. 변기 물로도 써요.'],
+  '계단 대피 동선 확인 (엘리베이터 정지)':['','정전되면 엘리베이터에 갇힐 수 있어요. 계단과 비상구 위치를 미리 걸어 보세요.'],
+  '보온담요 · 핫팩':['은박 보온담요와 핫팩','겨울에 정전되면 난방도 같이 멈춰요. 은박 담요는 접으면 손바닥만 해요.'],
+  '큰 가구·냉장고 고정':['가구 전도방지 벨트나 고정쇠','지진 때 다치는 원인 중 많은 부분이 넘어지는 가구와 가전이에요.'],
+  '신발 · 장갑을 머리맡에':['작업용 장갑, 침대 옆에 둘 신발','깨진 유리 위를 맨발로 걷다가 다치기 쉬워요.'],
+  '가스 밸브 · 두꺼비집 위치 확인':['','흔들림이 멈추면 불이 나지 않게 바로 잠가야 해요. 어디 있는지 모르면 못 잠가요.'],
+  '동네 집결 장소 정하기':['','통신이 끊기면 가족끼리 연락이 안 돼요. 만날 곳을 하나 정해 두세요.'],
+  '호루라기 (구조 요청)':['목에 거는 호루라기','갇혔을 때 소리치는 것보다 멀리, 오래 들리고 힘도 덜 들어요.'],
+  '계단 대피 동선 2곳 확인 (엘리베이터 금지)':['','한쪽 계단이 막힐 수 있어요. 불이 나면 엘리베이터는 연기가 지나가는 통로가 돼요.'],
+  '발코니 경량칸막이·대피공간 위치 확인':['','현관으로 못 나갈 때 옆집으로 넘어가거나 버티는 곳이에요. 앞에 짐을 쌓아 두지 마세요.'],
+  '소화기 위치 확인':['가정용 소화기 1개 이상','처음 붙은 불은 소화기 하나로 끌 수 있어요. 집에 없으면 하나 두세요.'],
+  '창문 없는 안쪽 방 정해 두기 (유리 파편)':['','폭발 충격이 오면 유리창이 깨져 날아와요. 창문에서 먼 방이 안전해요.'],
+  '젖은 수건 · 낮은 자세로 연기 피하기':['화재 대피 마스크 (방연 마스크)','불이 났을 때 크게 다치는 원인은 불보다 연기인 경우가 많아요.'],
+  '방독면 또는 마스크 · 젖은 수건':['정화통이 달린 방독면 (가족 수만큼)','일반 마스크로는 화학물질을 막기 어려워요. 방독면이 없으면 젖은 수건이라도 대세요.'],
+  '창문·문틈 막을 테이프 · 비닐':['문풍지·박스 테이프와 두꺼운 비닐','바깥 가스가 집 안으로 새어 드는 걸 늦춰 줘요.'],
+  '지하 말고 위층으로 (가스는 아래로 고임)':['','많은 화학 가스는 공기보다 무거워 지하와 낮은 곳에 고여요. 공습 때와 반대예요.'],
+  '바람 반대 방향 확인하기':['','가스는 바람을 타고 퍼져요. 바람이 불어오는 쪽으로 피하세요.'],
+  '노출되면 옷 벗고 비누로 씻기':['','옷과 피부에 묻은 물질을 빨리 없앨수록 덜 다쳐요.'],
+  '창문 닫고 환기팬·에어컨 끄기':['','바깥 공기가 집 안으로 들어오지 않게 해야 해요.'],
+  '창문 없는 안쪽 방이나 지하로':['','벽과 흙이 방사선을 막아 줘요. 건물 가운데, 낮은 곳일수록 좋아요.'],
+  '밖에 다녀오면 옷 갈아입고 씻기':['','방사성 물질은 먼지처럼 옷과 머리카락에 붙어요.'],
+  '갑상샘 방호약은 지자체 안내대로만 복용':['','원전 주변 지자체가 나눠 주는 약이에요. 안내 없이 아무 때나 먹으면 효과가 없거나 부작용이 생길 수 있어요.'],
+  '포장된 물·음식 먹기':['생수','밖에 놓여 있던 물과 음식은 오염됐을 수 있어요.'],
+  '해일 경보 즉시 높은 곳으로 (차보다 걸어서)':['','차는 길이 막히고 물에 떠밀려요. 가까운 높은 건물 위층이 더 빨라요.'],
+  '근처 해일 대피 장소·높은 건물 확인':['','바닷가에선 해일이 몇 분 안에 닿을 수 있어요. 미리 알아 둬야 바로 뛰어요.'],
+  '바닷가 저지대 벗어나는 길 미리 걸어 보기':['','당황하면 아는 길도 헷갈려요. 한 번 걸어 보면 몸이 기억해요.'],
+  '물이 빠져도 돌아가지 않기 (다음 파도)':['','해일은 여러 번 오고, 뒤에 오는 파도가 더 클 수 있어요.'],
+  '방수 가방에 신분증·약':['방수 가방 (드라이백)','젖으면 신분증도 약도 못 써요.'],
+  '산불 재난문자 오면 짐 최소로 바로 대피':['','산불은 바람을 타면 아주 빠르게 번져요. 짐 챙기다 늦는 경우가 많아요.'],
+  '산 반대쪽, 넓은 곳으로 이동':['','불은 산을 타고 번지고, 넓은 곳은 불이 옮겨 붙기 어려워요.'],
+  '마스크·젖은 수건으로 연기 막기':['KF94 마스크','산불 연기는 멀리까지 퍼지고 오래 남아요.'],
+  '차는 창문 닫고 전조등 켜기':['','연기 속에서 다른 차가 나를 볼 수 있게 해야 해요.'],
+  '집 주변 낙엽·땔감 치우기':['','날아온 불씨가 마른 낙엽에 옮겨 붙기 쉬워요.'],
+  '마스크 2주치':['KF94 마스크','유행 초기에는 마스크가 품귀될 수 있어요.'],
+  '해열제 · 체온계':['체온계와 해열제','열이 나는지 집에서 바로 확인하고, 병원에 가야 할지 판단할 수 있어요.'],
+  '2주 버틸 식량 · 생필품':['비상식량·쌀·휴지 등 생필품','격리되면 2주 정도 밖에 못 나갈 수 있어요.'],
+  '혼자 사는 가족·이웃 안부 순서 정하기':['','혼자 아프면 아무도 모를 수 있어요. 누가 누구에게 연락할지 정해 두세요.'],
+  '가까운 보건소·선별진료소 확인':['','증상이 생기면 어디로 가야 하는지 바로 알 수 있어요.'],
+  '현금 조금 더 (편의점도 카드 안 될 때)':['','결제 시스템이 멈추면 편의점, 마트에서도 현금만 받아요.'],
+  '도어락 비상 열쇠·건전지 확인':['AA 건전지 (도어락용)','도어락 건전지가 닳으면 문이 안 열려요. 비상 열쇠가 어디 있는지도 확인하세요.'],
+  '은행·카드사 고객센터 번호 메모':['','앱이 먹통이면 전화가 유일한 방법이에요.'],
+  '교통비로 쓸 현금':['','교통카드 단말기가 멈추면 현금으로 타야 해요.'],
+  '중요한 사진·파일 오프라인 백업':['외장하드','클라우드가 멈추면 사진과 서류를 꺼낼 수 없어요.'],
+  '안부 확인할 사람 1명 정하기':['','혼자 있다 다치면 아무도 모를 수 있어요.'],
+  '이웃 1명과 연락처 교환':['','가장 먼저 도와줄 수 있는 사람은 옆집이에요.'],
+  '아이 이름·연락처 이름표':['미아방지 팔찌나 이름표','대피 중에 헤어지면 아이가 부모 연락처를 말하기 어려워요.'],
+  '기저귀 · 분유 · 아이 간식 3일치':['분유 스틱, 기저귀, 아이 간식','대피소에는 아이용 물품이 거의 없어요.'],
+  '복용 약 이름·용량 메모':['','약을 잃어버려도 메모가 있으면 병원에서 같은 약을 빨리 받을 수 있어요.'],
+  '보청기·안경 여분 · 지팡이':['보청기 건전지, 여분 안경','경보나 안내 방송을 못 들으면 대피가 늦어져요.'],
+  '이동장 · 목줄 · 인식표':['반려동물 이동장과 인식표','임시 보호처나 일부 대피 시설은 이동장에 넣어야 받아 줘요.'],
+  '사료 · 물 3일치':['사료 소포장, 물','대피 중에는 사료를 구하기 어려워요.'],
+  '침수·가스 때 올라갈 위층 이웃 정해 두기':['','지하·반지하는 침수와 가스에 가장 약해요. 갈 곳을 미리 정해 두세요.'],
+  '현관 말고 다른 출구(창·뒷문) 확인':['','저층은 창문이 두 번째 출구가 될 수 있어요.'],
+  '계단·비상구 위치 확인':['','불이 나거나 정전되면 계단으로만 내려가야 해요.'],
+  '계단으로 1층까지 내려가는 시간 재 보기':['','고층은 생각보다 훨씬 오래 걸려요. 알고 있으면 언제 출발할지 판단할 수 있어요.'],
+  '피난안전구역·옥상 출입 가능 여부 확인':['','초고층은 중간층에 피난안전구역이 있어요. 옥상 문은 잠겨 있는 경우가 많아요.']
+};
 const FLCHECK = ['침수·가스 때 올라갈 위층 이웃 정해 두기','현관 말고 다른 출구(창·뒷문) 확인','계단·비상구 위치 확인','계단으로 1층까지 내려가는 시간 재 보기','피난안전구역·옥상 출입 가능 여부 확인'];
 // 지표 수집 자리: 배포 때 GA/GTM을 붙이면 dataLayer로 그대로 들어간다 (기획서 6.4)
 const track=(event,p={})=>{try{if(event!=='page_view'&&window.gtag)gtag('event',event,p)}catch{}}; // page_view는 gtag config가 자동으로 보냄
@@ -463,11 +559,20 @@ const hashOf=()=>`#r-${Object.keys(R).indexOf(S.r)}-${S.c}-${S.h}-${S.f}`;
 const $ = id=>document.getElementById(id);
 const opt = (label,d,on)=>{const b=document.createElement('button');b.className='opt';b.setAttribute('aria-pressed','false');
   b.innerHTML=label+(d?`<span class="d">${d}</span>`:'');b.onclick=on;return b};
-const missing=()=>STEP.filter(s=>S[s.k]===null);
-function updateCTA(){if(!$('result').hidden)return;const m=missing();$('go').classList.toggle('wait',m.length>0);
-  $('go').textContent=!m.length?'10초 진단 시작':m.length===4?'사는 곳부터 골라 주세요':m.length===1?`${m[0].name}만 고르면 끝`:`다음: ${m[0].name}`}
+// ── 입력은 한 단계씩: 고르면 다음 단계로 넘어가고, 4단계를 고르면 바로 진단 ──
+let step=1;
+const label=k=>k==='r'?S.r:k==='c'?CRISIS[S.c]?.short:k==='h'?HOME[S.h]?.name:FLOOR[S.f];
+function renderBar(){
+  $('stepbar').innerHTML=`<div class="dots">${STEP.map((s,i)=>`<i class="${i+1===step?'on':S[s.k]!==null?'done':''}"></i>`).join('')}<span>${step} / 4</span></div>`+
+    (step>1?`<div class="picked">${STEP.slice(0,step-1).map((s,i)=>`<button data-go="${i+1}">${esc(label(s.k))}</button>`).join('<b>›</b>')}</div>`:'');
+  $('stepbar').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>showStep(+b.dataset.go)); // 고른 것을 누르면 그 단계로 돌아감
+}
+function showStep(n){step=n;[1,2,3,4].forEach(i=>$('st'+i).hidden=i!==n);$('introBox').hidden=n>1;renderBar();updateCTA();scrollTo(0,0)}
+function updateCTA(){if(!$('result').hidden)return;const cur=STEP[step-1],ok=S[cur.k]!==null;
+  $('go').classList.toggle('wait',!ok);$('go').textContent=!ok?cur.msg:step<4?'다음':'10초 진단 시작';
+  $('back').hidden=step===1;$('back').textContent='이전'}
 function pick(box,btn,adv=true){box.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===btn));updateCTA();
-  const m=missing();if(adv&&m.length)$(m[0].h).scrollIntoView({behavior:'smooth',block:'start'})} // 고르면 다음 질문으로
+  if(adv)setTimeout(()=>step<4?showStep(step+1):start(),220)} // 살짝 눌린 걸 보여 준 뒤 넘어감
 
 Object.entries(GROUP).forEach(([gname,list])=>{const sec=document.createElement('div');sec.className='grp';sec.innerHTML=`<h3>${gname}</h3>`;
   const grid=document.createElement('div');grid.className='grid';
@@ -487,20 +592,25 @@ $('q').oninput=e=>{const q=e.target.value.trim().replace(/(특별|광역)?시$|�
   if(q&&shown.length===1&&S.r!==shown[0].dataset.r){S.r=shown[0].dataset.r;pick($('regions'),shown[0],false)} // 하나만 남으면 바로 선택(타이핑 중이라 스크롤은 안 함)
 };
 
-function showResult(){$('input').hidden=true;$('result').hidden=false;$('back').hidden=S.shared;$('friend').hidden=!S.shared;
+function showResult(){$('input').hidden=true;$('result').hidden=false;$('back').hidden=S.shared;$('back').textContent='다시';$('friend').hidden=!S.shared;
   $('go').classList.remove('wait');$('go').textContent=S.shared?'내 동네도 해보기':'스토리 카드 저장';scrollTo(0,0)}
-function showInput(){if(S.shared)Object.assign(S,{r:null,c:null,h:null,f:null});S.shared=false;$('result').hidden=true;$('input').hidden=false;$('back').hidden=true;$('friend').hidden=true;
-  try{history.replaceState(null,'',location.pathname+location.search)}catch{}updateCTA();scrollTo(0,0)}
-$('go').onclick=()=>{
-  if(S.shared){track('friend_try',{from:S.r});showInput();return}
-  if($('result').hidden===false){share();return}
-  const m=missing();if(m.length){$(m[0].h).scrollIntoView({behavior:'smooth',block:'start'});toast(m[0].msg);return}
+function showInput(){if(S.shared){Object.assign(S,{r:null,c:null,h:null,f:null});document.querySelectorAll('#input .opt').forEach(b=>b.setAttribute('aria-pressed','false'))}
+  S.shared=false;$('result').hidden=true;$('input').hidden=false;$('friend').hidden=true;
+  try{history.replaceState(null,'',location.pathname+location.search)}catch{}showStep(1)}
+function start(){
   $('scanT').textContent=`${S.r} 스캔 중…`;$('scan').classList.add('on');
   render(); // 카드도 스캔 연출 동안 미리 만들어 둔다
   track('simulate_complete',{region:S.r,crisis:S.c,home:S.h,floor:S.f,grade:gradeOf(scoreOf(S.r,S.c,S.h))});
   setTimeout(()=>{$('scan').classList.remove('on');showResult()},1200);
+}
+$('go').onclick=()=>{
+  if(S.shared){track('friend_try',{from:S.r});showInput();return}
+  if($('result').hidden===false){share();return}
+  const cur=STEP[step-1];if(S[cur.k]===null){toast(cur.msg);return}
+  step<4?showStep(step+1):start();
 };
-$('back').onclick=showInput;
+$('back').onclick=()=>$('result').hidden?showStep(Math.max(1,step-1)):showInput();
+renderBar();updateCTA();
 
 function analysis(){
   const v=R[S.r],c=CRISIS[S.c];
@@ -523,9 +633,16 @@ function render(){
     <p>층·가구 조건: ${FLOOR[S.f]} ${CRISIS[S.c].fl[S.f]>0?'+':CRISIS[S.c].fl[S.f]<0?'−':'±'}${Math.abs(CRISIS[S.c].fl[S.f])}점, ${HOME[S.h].name} ${HOME[S.h].adj>=0?'+':'−'}${Math.abs(HOME[S.h].adj)}점</p>`;
   const items=[...CHECK.base,...CHECK[S.c],...CHECK[S.h],FLCHECK[S.f]];
   $('check').innerHTML='';
-  items.forEach(t=>{const li=document.createElement('li'),b=document.createElement('button');b.textContent=t;
-    b.setAttribute('aria-pressed',S.done.has(t));b.onclick=()=>{S.done.has(t)?S.done.delete(t):S.done.add(t);saveDone();b.setAttribute('aria-pressed',S.done.has(t));prog(items)};
-    li.append(b);if(shopUrl(t))li.append(buyLink(t,'쿠팡','check'));$('check').append(li)});
+  // 왼쪽 네모 = 준비 완료 체크, 글자 = 펼쳐서 무엇을·왜 + 쿠팡 버튼
+  items.forEach((t,i)=>{const li=document.createElement('li'),[need,why]=DETAIL[t]||['',''],id='dt'+i;
+    li.innerHTML=`<div class="row"><button class="box" aria-label="${esc(t)} 준비 완료"></button><button class="txt" aria-expanded="false" aria-controls="${id}">${esc(t)}</button></div>
+      <div class="dt" id="${id}" hidden>${need?`<p><b>준비할 것</b>${esc(need)}</p>`:''}<p><b>왜 필요해요?</b>${esc(why)}</p></div>`;
+    const box=li.querySelector('.box'),txt=li.querySelector('.txt'),dt=li.querySelector('.dt');
+    const paint=()=>{box.setAttribute('aria-pressed',S.done.has(t));li.classList.toggle('done',S.done.has(t))};paint();
+    box.onclick=()=>{S.done.has(t)?S.done.delete(t):S.done.add(t);saveDone();paint();prog(items)};
+    txt.onclick=()=>{const open=dt.hidden;dt.hidden=!open;txt.setAttribute('aria-expanded',open);if(open)track('check_open',{item:t.slice(0,20)})};
+    if(shopUrl(t))dt.append(buyLink(t,`쿠팡에서 ${COUPANG[t].kw} 보기`,'check'));
+    $('check').append(li)});
   prog(items);
   drawCard(sc,g);
 }
