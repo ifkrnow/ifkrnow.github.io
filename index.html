@@ -223,9 +223,12 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
     </div>
   </div>
 
+  <!-- 체크리스트는 화면에서 숨김 (하단 [생존 체크리스트] 메뉴 → 물품 리스트 창). 체크 상태 계산용으로만 그려 둠 -->
+  <div hidden>
   <h2 id="checkH">72시간 생존 체크리스트</h2>
   <ul class="check" id="check"></ul>
   <p class="prog" id="prog"></p>
+  </div>
 
   <h2>아직 없는 준비물</h2>
   <div class="shop" id="shop"></div>
@@ -241,12 +244,6 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
   <div class="shlist" id="shList"></div>
   <p class="note">자료: 행정안전부 민방위대피시설 (공공데이터포털), <b>2026-11-15 기준</b>. 대피소는 새로 지정되거나 해제될 수 있으니 실제 대피 전에는 안전디딤돌 앱이나 국민재난안전포털에서 한 번 더 확인하세요. 지진·해일 대피장소도 국민재난안전포털에서 볼 수 있어요.</p>
 
-  <h2>응급실·공식 안내</h2>
-  <div class="links">
-    <a href="https://www.safekorea.go.kr" target="_blank" rel="noopener"><b>국민재난안전포털</b>내 주변 민방위·지진 대피소 찾기</a>
-    <a href="https://www.e-gen.or.kr" target="_blank" rel="noopener"><b>응급의료포털 E-Gen</b>지금 문 연 응급실 찾기</a>
-    <div><b>안전디딤돌 앱</b>앱스토어·플레이스토어에서 「안전디딤돌」 검색 · 재난문자와 대피소를 한곳에서</div>
-  </div>
 
 </main>
 
@@ -273,7 +270,6 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
     <div class="kithead"><h3 id="kitH">생존 물품 리스트</h3><button id="kitClose" aria-label="닫기">닫기</button></div>
     <p class="kitsub" id="kitSub"></p>
     <ol class="kitlist" id="kitList"></ol>
-    <button class="more" id="kitToCheck">할 일까지 담긴 체크리스트 전체 보기</button>
     <p class="note">"이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."</p>
   </div>
 </div>
@@ -941,7 +937,6 @@ function openKit(){
 }
 const closeKit=()=>{$('kit').hidden=true;document.body.style.overflow=''};
 $('kitClose').onclick=closeKit;$('kit').onclick=e=>{if(e.target===$('kit'))closeKit()};
-$('kitToCheck').onclick=()=>{closeKit();$('checkH').scrollIntoView({behavior:'smooth',block:'start'})};
 document.querySelectorAll('[data-sns]').forEach(a=>a.addEventListener('click',()=>track('follow_click',{sns:a.dataset.sns,where:a.closest('footer')?'footer':'result'})));
 track('page_view',{src:new URLSearchParams(location.search).get('utm_source')||'direct'});
 // 친구가 보낸 결과 링크로 들어온 경우
