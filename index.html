@@ -263,7 +263,7 @@ const NOTE = {
 };
 // 왜 이 등급? [불리한 점, 버티는 점] — 댓글 답글처럼 지역별 사실만
 const WHY = {
-  서울:[['수도·정부 기관 집중','인구 밀집'],['지하철·지하상가 대피 공간 최다','병원·복구 인력 최다']],
+  서울:[['수도·정부 기관 집중','인구 밀집'],['지하 대피 공간 최다','병원·복구 인력 최다']],
   인천:[['공항·항만','서해 접경 섬'],['공항·항만 보급','대형 병원']],
   평택:[['주한미군 최대 기지','평택항'],['평야 지대 지반','신축 단지 지하주차장']],
   대전:[['정부청사·연구단지'],['접경에서 멂','국토 중앙이라 지원이 빠름']],
@@ -281,7 +281,7 @@ const WHY = {
   울산:[['정유·화학 공단','원전 인접'],['대도시 인프라']],
   세종:[['정부세종청사'],['접경에서 멂','신도시 지하주차장']],
   거제:[['대형 조선소','다리에 의존하는 섬'],['접경에서 멂','남해 바닷길']],
-  진해:[['해군 기지사령부·해군사관학교'],['산이 감싼 지형']],
+  진해:[['해군기지·해군사관학교'],['산이 감싼 지형']],
   김해:[['김해공항 인접'],['부산 생활권 인프라']],
   전주:[['도청 소재지'],['주요 기지·접경에서 멂','평야 농업 기반']],
   군산:[['미 공군 군산기지','서해안 저지대'],['항만 보급']],
@@ -297,7 +297,7 @@ const WHY = {
   성남:[['서울공항(군 비행장)','인구 밀집'],['대도시 인프라','산을 낀 지형']],
   청주:[['공군 비행장·청주공항'],['접경에서 멂','국토 중앙']],
   천안:[['교통 요지'],['접경에서 멂','물자가 빨리 닿음']],
-  춘천:[['전방 부대와 가까운 강원 북부'],['인구 적음','산·호수 지형']],
+  춘천:[['전방 부대와 가까움'],['인구 적음','산·호수 지형']],
   강릉:[['공군 비행장','동해안 해일'],['접경에서 거리가 있음']],
   경주:[['원전 인접','2016년 지진·활성단층'],['접경에서 멂']],
   목포:[['서남해 끝이라 지원이 늦음','저지대'],['표적 가치 낮음']],
@@ -366,6 +366,11 @@ const TIER = {
   pand:(r,[,,,,o,l])=>l>=75?'사람이 빽빽해 가장 빨리 퍼진다. 대신 병원도 많다.':l>=45?'인구가 중간. 퍼지는 속도도 중간.':'사람이 적어 늦게 퍼진다. 대신 큰 병원이 멀다.',
   cyber:(r,[,,,,o,l])=>l>=75?'카드·간편결제에 가장 많이 기대는 대도시. 현금 없으면 편의점도 못 간다.':o>=60?'외진 곳이라 원래 현금·이웃 거래가 남아 있다.':'현금 조금이면 버틸 수 있는 정도.'
 };
+// 왜 이 등급? [불리한 점, 버티는 점] — 결과 화면과 스토리 카드가 같이 씀
+const whyOf=()=>{const [xb,xg]=WHYX[S.c]?WHYX[S.c](S.r):[null,null];
+  return [[xb,...WHY[S.r][0].filter(t=>!(xb&&xb.includes('원전')&&t.includes('원전')))].filter(Boolean).slice(0,3),[xg,...WHY[S.r][1]].filter(Boolean).slice(0,3)]};
+const bestAx=()=>CRISIS[S.c].ax.map(([k,w])=>[k,val(R[S.r],k)*w]).sort((a,b)=>b[1]-a[1])[0][0];
+const pts=n=>`${n>0?'+':n<0?'−':'±'}${Math.abs(n)}점`;
 const barKeys=()=>[...new Set([...CRISIS[S.c].ax.map(a=>a[0]),'war','infra','terrain','shelter'])].slice(0,4); // 그 위기에 중요한 지표 먼저
 const noteOf=(r,c)=>TIER[c]?TIER[c](r,R[r]):NOTE[r][Object.keys(CRISIS).indexOf(c)];
 // 위기별로 덧붙는 이유 한 줄 [불리, 버팀]
@@ -378,10 +383,10 @@ const WHYX = {
 };
 const FLOOR = ['지하·반지하','1~3층','4~10층','11~20층','21층 이상'];
 const HOME = {
-  solo:{name:'1인 가구', d:'혼자 움직인다', adj:2, line:'혼자라 이동이 빨라 +2점. 대신 안부를 확인해 줄 사람을 미리 정해 두세요.'},
-  family:{name:'가족·아이', d:'아이와 함께', adj:-5, line:'아이와 함께면 이동이 느려 −5점. 집결 장소를 아이와 미리 걸어 보세요.'},
-  elder:{name:'어르신과 함께', d:'고령·거동이 불편한 가족', adj:-6, line:'어르신과 함께면 계단 이동이 어려워 −6점. 복용 약 이름을 종이에 적어 두세요.'},
-  pet:{name:'반려동물', d:'함께 데리고 간다', adj:-3, line:'상당수 대피소가 반려동물을 받지 않아 −3점. 맡길 곳을 미리 정해 두세요.'}
+  solo:{name:'1인 가구', d:'혼자 움직인다', adj:2, why:'혼자라 이동이 빨라', line:'혼자라 이동이 빨라 +2점. 대신 안부를 확인해 줄 사람을 미리 정해 두세요.'},
+  family:{name:'가족·아이', d:'아이와 함께', adj:-5, why:'아이와 함께라 이동이 느려', line:'아이와 함께면 이동이 느려 −5점. 집결 장소를 아이와 미리 걸어 보세요.'},
+  elder:{name:'어르신과 함께', d:'고령·거동이 불편한 가족', adj:-6, why:'어르신과 함께라 계단이 어려워', line:'어르신과 함께면 계단 이동이 어려워 −6점. 복용 약 이름을 종이에 적어 두세요.'},
+  pet:{name:'반려동물', d:'함께 데리고 간다', adj:-3, why:'대피소가 반려동물을 잘 안 받아', line:'상당수 대피소가 반려동물을 받지 않아 −3점. 맡길 곳을 미리 정해 두세요.'}
 };
 // 순위: 같은 위기·가구·층 조건에서 16개 지역 중 몇 위
 const rankOf = (r,c,h,f)=>1+Object.keys(R).filter(o=>scoreOf(o,c,h,f)>scoreOf(r,c,h,f)).length;
@@ -521,8 +526,7 @@ function render(){
   chip('chipF',FLOOR.map((n,i)=>[i,n]),S.f,k=>S.f=k);
   $('detail').innerHTML=bars+`<div class="lines">${lines.map(t=>`<p>${t}</p>`).join('')}</div>`;
 
-  const [xb,xg]=WHYX[S.c]?WHYX[S.c](S.r):[null,null];
-  const bad=[xb,...WHY[S.r][0].filter(t=>!(xb&&xb.includes('원전')&&t.includes('원전')))].filter(Boolean).slice(0,3),good=[xg,...WHY[S.r][1]].filter(Boolean).slice(0,3),li=a=>a.map(t=>`<li>${t}</li>`).join('');
+  const [bad,good]=whyOf(),li=a=>a.map(t=>`<li>${t}</li>`).join('');
   $('whyH').textContent=`왜 ${eun(S.r)} ${g}등급?`;
   $('why').innerHTML=`<div><h4>불리한 점</h4><ul>${li(bad)}</ul></div><div><h4>버티는 점</h4><ul>${li(good)}</ul></div>
     <p>층·가구 조건: ${FLOOR[S.f]} ${CRISIS[S.c].fl[S.f]>0?'+':CRISIS[S.c].fl[S.f]<0?'−':'±'}${Math.abs(CRISIS[S.c].fl[S.f])}점, ${HOME[S.h].name} ${HOME[S.h].adj>=0?'+':'−'}${Math.abs(HOME[S.h].adj)}점</p>`;
@@ -587,27 +591,42 @@ async function drawCard(sc,g){
   if($('cardImg').src)$('cardImg').classList.add('busy'); // 새 카드 나올 때까지 이전 카드 흐리게
   const seq=++cardSeq,W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
   const F=getComputedStyle(document.body).fontFamily,D=`'Black Han Sans',${F}`,v=R[S.r],brand='#ff4b1f',sub='#a59d97',fg='#f6f2ee';
-  try{await document.fonts.load(`80px 'Black Han Sans'`,S.r+g+'너네 동네는 몇 등급?')}catch{} // 한글은 글자별 묶음으로 나뉘어 받아짐 → 쓸 글자를 넘겨야 다 받는다
+  try{await document.fonts.load(`80px 'Black Han Sans'`,S.r+g+'너네 동네는 몇 등급?왜등급')}catch{} // 한글은 글자별 묶음으로 나뉘어 받아짐 → 쓸 글자를 넘겨야 다 받는다
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(charSVG(g));
   try{await img.decode()}catch{}
   if(seq!==cardSeq)return; // 그 사이 다른 결과로 바뀌었으면 버린다
   x.fillStyle='#0f0d0c';x.fillRect(0,0,W,H);x.textBaseline='alphabetic';
   // 위 270px는 인스타 UI 가림 영역 → 비워 둔다
-  x.font=`700 40px ${F}`;x.fillStyle=brand;x.fillText('내 동네 위기 시뮬레이터',96,350);
-  x.fillStyle=fg;x.font=`400 112px ${D}`;x.fillText(S.r,96,475);
-  x.font=`600 44px ${F}`;x.fillStyle=sub;x.fillText(`${CRISIS[S.c].name} · ${HOME[S.h].name} · ${FLOOR[S.f]}`,96,550);
-  x.drawImage(img,500,610,430,430);
-  x.fillStyle=fg;x.font=`400 440px ${D}`;x.fillText(g,84,1020);
-  x.font=`600 52px ${F}`;x.fillStyle=sub;x.fillText('안전점수',96,1120);x.fillStyle=fg;x.font=`800 56px ${F}`;x.fillText(`${sc} / 100`,320,1120);
-  x.font=`600 42px ${F}`;x.fillStyle=sub;x.fillText(`같은 조건 ${NR}곳 중 `,96,1182);const w=x.measureText(`같은 조건 ${NR}곳 중 `).width;
-  x.fillStyle='#ff8a2c';x.font=`800 42px ${F}`;x.fillText(`${rankOf(S.r,S.c,S.h,S.f)}위`,96+w,1182);
-  barKeys().forEach((k,i)=>{const y=1240+i*48;x.font=`500 34px ${F}`;x.fillStyle=sub;x.fillText(AX[k],96,y+12);
-    x.fillStyle='#2e2926';x.fillRect(340,y-6,560,14);x.fillStyle=brand;x.fillRect(340,y-6,560*val(v,k)/100,14)});
+  // 너무 긴 글은 폭에 맞춰 … 처리 (오른쪽 935px 넘지 않게)
+  const fit=(t,maxW)=>{if(x.measureText(t).width<=maxW)return t;while(t.length>1&&x.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t+'…'};
+  const L=96,RX=935;
+  x.font=`700 38px ${F}`;x.fillStyle=brand;x.fillText('내 동네 위기 시뮬레이터',L,330);
+  x.fillStyle=fg;x.font=`400 104px ${D}`;x.fillText(S.r,L,440);
+  x.font=`600 40px ${F}`;x.fillStyle=sub;x.fillText(`${CRISIS[S.c].name} · ${HOME[S.h].name} · ${FLOOR[S.f]}`,L,505);
+  x.drawImage(img,600,535,320,320);
+  x.fillStyle=fg;x.font=`400 350px ${D}`;x.fillText(g,84,835);
+  x.font=`600 46px ${F}`;x.fillStyle=sub;x.fillText('안전점수',L,915);x.fillStyle=fg;x.font=`800 50px ${F}`;x.fillText(`${sc} / 100`,300,915);
+  x.font=`600 38px ${F}`;x.fillStyle=sub;x.fillText(`같은 조건 ${NR}곳 중 `,L,972);const w=x.measureText(`같은 조건 ${NR}곳 중 `).width;
+  x.fillStyle='#ff8a2c';x.font=`800 38px ${F}`;x.fillText(`${rankOf(S.r,S.c,S.h,S.f)}위`,L+w,972);
+  // 왜 이 등급? — 불리한 점 / 버티는 점 2칸
+  x.fillStyle='#2e2926';x.fillRect(L,1012,RX-L,2);
+  x.font=`400 46px ${D}`;x.fillStyle=fg;x.fillText(`왜 ${g}등급?`,L,1078);
+  const [bad,good]=whyOf(),CW=(RX-L-40)/2,C2=L+CW+40;
+  x.font=`700 30px ${F}`;x.fillStyle='#ff8a2c';x.fillText('불리한 점',L,1134);x.fillStyle=sub;x.fillText('버티는 점',C2,1134);
+  x.font=`600 34px ${F}`;x.fillStyle=fg;
+  bad.slice(0,2).forEach((t,i)=>x.fillText(fit('· '+t,CW),L,1186+i*48));
+  good.slice(0,2).forEach((t,i)=>x.fillText(fit('· '+t,CW),C2,1186+i*48));
+  // 버틸 구석 · 층 · 가구 점수
+  const fl=CRISIS[S.c].fl[S.f],ft=CRISIS[S.c].ft.split('.')[0];
+  [['버틸 구석',AX[bestAx()]],[`${FLOOR[S.f]} ${pts(fl)}`,ft],[`${HOME[S.h].name} ${pts(HOME[S.h].adj)}`,HOME[S.h].why]].forEach(([k,t],i)=>{
+    const y=1300+i*50;x.font=`700 32px ${F}`;x.fillStyle=i?(String(k).includes('−')?'#ff8a2c':fg):'#ff8a2c';x.fillText(k,L,y);const kw=x.measureText(k+'  ').width;
+    x.font=`500 32px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y)});
+  x.fillStyle='#2e2926';x.fillRect(L,1428,RX-L,2);
   const others=Object.entries(CRISIS).filter(([k])=>k!==S.c).map(([k,c])=>`${c.short} ${gradeOf(scoreOf(S.r,k,S.h))}`);
-  x.font=`600 34px ${F}`;x.fillStyle=sub;x.fillText('같은 집, 다른 위기',96,1460);x.fillStyle=fg;x.font=`700 40px ${F}`;
-  x.fillText(others.slice(0,5).join('  '),96,1516);x.fillText(others.slice(5).join('  '),96,1570);
-  x.font=`400 62px ${D}`;x.fillStyle=fg;x.fillText('너네 동네는 몇 등급?',96,1658);
-  x.font=`500 34px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now 프로필 링크 · 공식 등급 아님',96,1710);
+  x.font=`600 32px ${F}`;x.fillStyle=sub;x.fillText('같은 집, 다른 위기',L,1484);x.fillStyle=fg;x.font=`700 38px ${F}`;
+  x.fillText(others.slice(0,5).join('  '),L,1538);x.fillText(others.slice(5).join('  '),L,1590);
+  x.font=`400 60px ${D}`;x.fillStyle=fg;x.fillText('너네 동네는 몇 등급?',L,1672);
+  x.font=`500 32px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now 프로필 링크 · 공식 등급 아님',L,1720);
   cv.toBlob(b=>{if(seq!==cardSeq)return;cardBlob=b;$('cardImg').src=URL.createObjectURL(b);$('cardImg').classList.remove('busy')},'image/png');
 }
 $('introChar').innerHTML=charSVG('C');$('scanChar').innerHTML=charSVG('C');
