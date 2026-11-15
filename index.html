@@ -76,6 +76,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .links>*{display:block;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px 16px;font-size:14px;color:var(--sub);text-decoration:none}
 .links b{display:block;color:var(--fg);font-size:16px}.links a b::after{content:' ↗';color:var(--dim)}
 .links strong{color:var(--fg);font-size:16px}
+.shelter{display:flex;gap:8px}.shelter .search{flex:1;min-width:0}
+.shbtn{flex:none;height:48px;padding:0 18px;border-radius:12px;background:var(--fg);color:var(--bg);font-weight:800}
+.shlist{display:grid;gap:6px;margin-top:10px}
+.shrow{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:12px 14px;display:grid;gap:8px}
+.shrow b{display:block;font-size:15px}.shrow span{display:block;font-size:13px;color:var(--sub)}
+.shrow .act{display:flex;gap:6px}.shrow .act a{flex:1;text-align:center;min-height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--fg);text-decoration:none}
 .grp+.grp{margin-top:14px}.grp h3{font-size:13px;font-weight:600;color:var(--dim);letter-spacing:.04em}
 .why{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .why>div{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;min-width:0}
@@ -159,7 +165,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <button class="more" id="shopMore" hidden></button>
   <p class="note">이 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
 
-  <h2>내 주변 대피소·응급실 찾기</h2>
+  <h2>우리 동네 대피소 찾기</h2>
+  <form class="shelter" id="shForm">
+    <input class="search" id="shQ" type="search" placeholder="동네 이름 (예: 화명동, 옥길동, 송도동)" autocomplete="off" aria-label="동네 이름으로 대피소 찾기">
+    <button class="shbtn" type="submit">찾기</button>
+  </form>
+  <p class="note" id="shMsg">동·읍·면 이름을 넣으면 그 동네 민방위 대피소가 나와요. 위치 정보는 쓰지 않아요.</p>
+  <div class="shlist" id="shList"></div>
+  <p class="note">자료: 행정안전부 민방위대피시설 (공공데이터포털). 지진·해일 대피장소는 아래 국민재난안전포털에서 확인하세요.</p>
+
+  <h2>응급실·공식 안내</h2>
   <div class="links">
     <a href="https://www.safekorea.go.kr" target="_blank" rel="noopener"><b>국민재난안전포털</b>내 주변 민방위·지진 대피소 찾기</a>
     <a href="https://www.e-gen.or.kr" target="_blank" rel="noopener"><b>응급의료포털 E-Gen</b>지금 문 연 응급실 찾기</a>
@@ -618,6 +633,28 @@ $('copyLink').onclick=async()=>{
   const u=location.origin+location.pathname+'?utm_source=share&utm_medium=link'+hashOf();
   track('link_copy');
   try{await navigator.clipboard.writeText(u);toast('결과 링크를 복사했어요')}catch{toast('복사가 막혔어요. 주소창 링크를 복사하세요')}
+};
+// ── 우리 동네 대피소 찾기: shelters.json(행안부 민방위대피시설)을 누를 때만 불러와 동네 이름으로 거름. 위치정보 안 씀 ──
+// 행: [위도, 경도, 시설명, 주소, 수용인원, 지하1/지상0, 동네]
+let SH=null;
+const loadSH=async()=>SH||(SH=await fetch('shelters.json').then(r=>{if(!r.ok)throw 0;return r.json()}));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+$('shForm').onsubmit=async e=>{e.preventDefault();
+  const raw=$('shQ').value.trim(),q=raw.replace(/\s+/g,'');
+  if(q.length<2){$('shMsg').textContent='동네 이름을 두 글자 이상 넣어 주세요.';return}
+  $('shMsg').textContent='찾는 중…';$('shList').innerHTML='';
+  let rows;try{rows=await loadSH()}catch{$('shMsg').textContent='대피소 자료를 불러오지 못했어요. 잠시 뒤 다시 해 주세요.';return}
+  // 동 이름은 '화명동'·'화명' 둘 다 받게 끝의 동/읍/면/리 글자를 떼고 비교
+  const core=q.replace(/(동|읍|면|리)$/,'');
+  const hit=rows.filter(r=>(r[6]+r[3]).replace(/\s+/g,'').includes(q)||r[6].split(' ').some(t=>t.replace(/(\d+)?(동|읍|면|리|가)$/,'')===core));
+  track('shelter_search',{n:hit.length}); // 입력한 동네 이름은 보내지 않음
+  if(!hit.length){$('shMsg').textContent=`'${raw}'로 찾은 대피소가 없어요. 동·읍·면 이름으로 다시 넣어 보세요.`;return}
+  const mine=r=>S.r&&(r[6]+r[3]).includes(S.r)?1:0; // 같은 이름 동이 여러 도시에 있으면 진단한 지역 먼저
+  hit.sort((a,b)=>mine(b)-mine(a)||b[5]-a[5]||b[4]-a[4]); // 그다음 지하 시설·큰 곳 먼저
+  const show=hit.slice(0,8);
+  $('shMsg').textContent=`${hit.length}곳 찾았어요${hit.length>8?' · 수용인원 큰 곳 8개만 보여요':''}`;
+  $('shList').innerHTML=show.map(([la,lo,n,a,c,u])=>`<div class="shrow"><div><b>${esc(n)}</b><span>${esc(a)}</span><span>${u?'지하':'지상'} · 최대 ${c.toLocaleString()}명</span></div>
+    <div class="act"><a href="https://map.kakao.com/link/map/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">지도</a><a href="https://map.kakao.com/link/to/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">길찾기</a></div></div>`).join('');
 };
 track('page_view',{src:new URLSearchParams(location.search).get('utm_source')||'direct'});
 // 친구가 보낸 결과 링크로 들어온 경우
