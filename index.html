@@ -45,6 +45,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .opt .d{display:block;font-size:13px;color:var(--sub);font-weight:400}.opt[aria-pressed=true] .d{color:#5a524d}
 .dock{position:fixed;left:0;right:0;bottom:0;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left,0px));background:linear-gradient(transparent,var(--bg) 30%)}
 .dock .in{max-width:448px;margin:0 auto;display:flex;gap:8px}
+.menu{max-width:448px;margin:0 auto 8px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.menu button{min-height:40px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:14px;font-weight:700}
+body.has-menu{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 .cta{flex:1;height:56px;border-radius:14px;background:var(--brand);color:#fff;font-weight:800;font-size:17px}
 .cta.wait{background:var(--line);color:var(--sub)}
 .ghost{height:56px;padding:0 18px;border-radius:14px;border:1px solid var(--line)}
@@ -202,7 +206,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     </div>
   </div>
 
-  <h2>72시간 생존 체크리스트</h2>
+  <h2 id="checkH">72시간 생존 체크리스트</h2>
   <ul class="check" id="check"></ul>
   <p class="prog" id="prog"></p>
 
@@ -211,7 +215,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <button class="more" id="shopMore" hidden></button>
   <p class="note">"이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."</p>
 
-  <h2>우리 동네 대피소 찾기</h2>
+  <h2 id="shelterH">우리 동네 대피소 찾기</h2>
   <form class="shelter" id="shForm">
     <input class="search" id="shQ" type="search" placeholder="동네 이름 (예: 화명동, 옥길동, 송도동)" autocomplete="off" aria-label="동네 이름으로 대피소 찾기">
     <button class="shbtn" type="submit">찾기</button>
@@ -239,7 +243,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <p class="copy">© ifkr.now · <a href="https://www.instagram.com/ifkr.now/" target="_blank" rel="noopener" data-sns="instagram">인스타그램 @ifkr.now</a> · <a href="https://www.youtube.com/@ifkrnow" target="_blank" rel="noopener" data-sns="youtube">유튜브 @ifkrnow</a></p>
 </footer>
 
-<div class="dock"><div class="in">
+<div class="dock"><nav class="menu" id="menu" hidden aria-label="바로 가기">
+  <button data-to="checkH">생존 체크리스트</button><button data-to="shelterH">동네 대피소 찾기</button>
+</nav><div class="in">
   <button class="ghost" id="back" hidden>다시</button>
   <button class="cta wait" id="go">사는 곳부터 골라 주세요</button>
 </div></div>
@@ -633,7 +639,7 @@ function renderBar(){
     (step>1?`<div class="picked">${STEP.slice(0,step-1).map((s,i)=>`<button data-go="${i+1}">${esc(label(s.k))}</button>`).join('<b>›</b>')}</div>`:'');
   $('stepbar').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>showStep(+b.dataset.go)); // 고른 것을 누르면 그 단계로 돌아감
 }
-function showStep(n){step=n;[1,2,3,4].forEach(i=>$('st'+i).hidden=i!==n);$('introBox').hidden=n>1;document.querySelector('footer').hidden=true;renderBar();updateCTA();scrollTo(0,0)}
+function showStep(n){step=n;$('menu').hidden=true;document.body.classList.remove('has-menu');[1,2,3,4].forEach(i=>$('st'+i).hidden=i!==n);$('introBox').hidden=n>1;document.querySelector('footer').hidden=true;renderBar();updateCTA();scrollTo(0,0)}
 function updateCTA(){if(!$('result').hidden)return;const cur=STEP[step-1],ok=S[cur.k]!==null;
   $('go').classList.toggle('wait',!ok);$('go').textContent=!ok?cur.msg:step<4?'다음':'10초 진단 시작';
   $('back').hidden=step===1;$('back').textContent='이전'}
@@ -659,6 +665,7 @@ $('q').oninput=e=>{const q=e.target.value.trim().replace(/(특별|광역)?시$|�
 };
 
 function showResult(){$('input').hidden=true;$('result').hidden=false;document.querySelector('footer').hidden=false; // 안내문은 결과 화면에서만 (입력 단계는 한 화면에)
+$('menu').hidden=false;document.body.classList.add('has-menu'); // 하단 바로 가기 메뉴는 결과 화면에서만
 $('back').hidden=S.shared;$('back').textContent='다시';$('friend').hidden=!S.shared;
   $('go').classList.remove('wait');$('go').textContent=S.shared?'내 동네도 해보기':'스토리 카드 저장';scrollTo(0,0)}
 function showInput(){if(S.shared){Object.assign(S,{r:null,c:null,h:null,f:null});document.querySelectorAll('#input .opt').forEach(b=>b.setAttribute('aria-pressed','false'))}
@@ -847,6 +854,7 @@ $('shForm').onsubmit=async e=>{e.preventDefault();
   $('shList').innerHTML=show.map(([la,lo,n,a,c,u])=>`<div class="shrow"><div><b>${esc(n)}</b><span>${esc(a)}</span><span>${u?'지하':'지상'} · 최대 ${c.toLocaleString()}명</span></div>
     <div class="act"><a href="https://map.kakao.com/link/map/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">지도</a><a href="https://map.kakao.com/link/to/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">길찾기</a></div></div>`).join('');
 };
+document.querySelectorAll('#menu [data-to]').forEach(b=>b.onclick=()=>{$(b.dataset.to).scrollIntoView({behavior:'smooth',block:'start'});track('menu',{to:b.dataset.to})});
 document.querySelectorAll('[data-sns]').forEach(a=>a.addEventListener('click',()=>track('follow_click',{sns:a.dataset.sns,where:a.closest('footer')?'footer':'result'})));
 track('page_view',{src:new URLSearchParams(location.search).get('utm_source')||'direct'});
 // 친구가 보낸 결과 링크로 들어온 경우
