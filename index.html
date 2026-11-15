@@ -97,6 +97,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .stepbar .picked button{min-height:34px;padding:0 12px;border:1px solid var(--line);border-radius:17px;font-size:14px;font-weight:700}
 .stepbar .picked b{color:var(--dim);font-weight:400}
 .step h2{margin-top:18px}
+.follow{margin-top:16px;border:1px solid var(--line);border-radius:16px;background:var(--card);padding:16px;display:grid;gap:12px}
+.follow p{font-size:14px;color:var(--sub)}.follow p b{display:block;font-size:17px;color:var(--fg);margin-bottom:2px}
+.fbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fbtns a{min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;border:1px solid var(--line);color:var(--fg)}
+.fbtns a[data-sns=instagram]{background:var(--brand);border-color:var(--brand);color:#fff}
+.fix .copy a{color:var(--sub)}
 .grp+.grp{margin-top:14px}.grp h3{font-size:13px;font-weight:600;color:var(--dim);letter-spacing:.04em}
 .why{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .why>div{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;min-width:0}
@@ -188,6 +194,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <div class="why" id="why"></div>
   <div class="detail" id="detail"></div>
 
+  <div class="follow">
+    <p><b id="followH">이런 위기, 영상으로 먼저 봐요</b>전쟁·재난이 우리 동네에 오면 어떻게 되는지 매주 시뮬레이션해요.</p>
+    <div class="fbtns">
+      <a href="https://www.instagram.com/ifkr.now/" target="_blank" rel="noopener" data-sns="instagram">인스타그램 팔로우</a>
+      <a href="https://www.youtube.com/@ifkrnow" target="_blank" rel="noopener" data-sns="youtube">유튜브 구독</a>
+    </div>
+  </div>
+
   <h2>72시간 생존 체크리스트</h2>
   <ul class="check" id="check"></ul>
   <p class="prog" id="prog"></p>
@@ -222,7 +236,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <p>이름·연락처 같은 개인정보는 받지 않습니다. 등급 계산은 이 기기 안에서 끝나고, 체크리스트 체크 표시는 이 기기에만 저장됩니다. 사이트 개선을 위해 어떤 지역·위기를 골랐는지, 어떤 버튼을 눌렀는지는 구글 애널리틱스로 익명 통계만 모읍니다.</p>
   <h4>쿠팡 파트너스 안내</h4>
   <p>"이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다." 수수료는 구매 가격에 영향을 주지 않으며, 링크는 누를 때만 열립니다.</p>
-  <p class="copy">© ifkr.now</p>
+  <p class="copy">© ifkr.now · <a href="https://www.instagram.com/ifkr.now/" target="_blank" rel="noopener" data-sns="instagram">인스타그램 @ifkr.now</a> · <a href="https://www.youtube.com/@ifkrnow" target="_blank" rel="noopener" data-sns="youtube">유튜브 @ifkrnow</a></p>
 </footer>
 
 <div class="dock"><div class="in">
@@ -682,6 +696,8 @@ function render(){
 
   const [bad,good]=whyOf(),li=a=>a.map(t=>`<li>${t}</li>`).join('');
   $('whyH').textContent=`왜 ${eun(S.r)} ${g}등급?`;
+  const WHEN={war:'공습이 오면',apt:'폭격을 맞으면',out:'정전이 되면',quake:'지진이 나면',gas:'독가스가 퍼지면',nuke:'원전 사고가 나면',tsu:'해일이 오면',fire:'산불이 번지면',pand:'감염병이 돌면',cyber:'통신·결제가 멈추면'};
+  $('followH').textContent=`${WHEN[S.c]}, ${eun(S.r)}? 영상으로 먼저 봐요`;
   $('why').innerHTML=`<p class="ins">${esc(insightOf(S.r,S.c))}</p><div><h4>불리한 점</h4><ul>${li(bad)}</ul></div><div><h4>버티는 점</h4><ul>${li(good)}</ul></div>
     <p>층·가구 조건: ${FLOOR[S.f]} ${CRISIS[S.c].fl[S.f]>0?'+':CRISIS[S.c].fl[S.f]<0?'−':'±'}${Math.abs(CRISIS[S.c].fl[S.f])}점, ${HOME[S.h].name} ${HOME[S.h].adj>=0?'+':'−'}${Math.abs(HOME[S.h].adj)}점</p>`;
   const items=[...CHECK.base,...CHECK[S.c],...CHECK[S.h],FLCHECK[S.f]];
@@ -831,6 +847,7 @@ $('shForm').onsubmit=async e=>{e.preventDefault();
   $('shList').innerHTML=show.map(([la,lo,n,a,c,u])=>`<div class="shrow"><div><b>${esc(n)}</b><span>${esc(a)}</span><span>${u?'지하':'지상'} · 최대 ${c.toLocaleString()}명</span></div>
     <div class="act"><a href="https://map.kakao.com/link/map/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">지도</a><a href="https://map.kakao.com/link/to/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">길찾기</a></div></div>`).join('');
 };
+document.querySelectorAll('[data-sns]').forEach(a=>a.addEventListener('click',()=>track('follow_click',{sns:a.dataset.sns,where:a.closest('footer')?'footer':'result'})));
 track('page_view',{src:new URLSearchParams(location.search).get('utm_source')||'direct'});
 // 친구가 보낸 결과 링크로 들어온 경우
 (()=>{const m=location.hash.match(/^#r-(\d+)-(\w+)-(\w+)-(\d)$/),r=m&&Object.keys(R)[+m[1]];
