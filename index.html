@@ -272,7 +272,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
   <h4>점수는 이렇게 계산해요</h4>
   <p>지역마다 9가지 지표(0~100)에 위기별 가중치를 곱해 더하고, 가구·층 조건 점수를 더하고 뺍니다. 이 중 4가지는 <b>공개 자료로 계산</b>합니다. ① 타격 거리 = 시청에서 군사분계선까지 직선거리 60% + 주요 군사·국가 시설 수 40% ② 원전 거리 = 가장 가까운 원전까지 직선거리 ③ 대피 인프라 = 주민 1명당 민방위 대피소 수용 인원(행정안전부) ④ 인구 밀집 = 인구 밀도(2024년 말 인구·면적 근삿값). 회복력·지형·보급 속도·해안·산불 5가지는 지역 특성을 보고 ifkr.now가 정한 값입니다. 등급은 S 80점 이상, A 65, B 50, C 35, D 그 아래입니다.</p>
   <p>실제 재난 상황에서는 재난문자와 정부·지자체 공식 안내(안전디딤돌 앱, 국민재난안전포털)를 항상 먼저 따르세요.</p>
-  <p>이름·연락처 같은 개인정보는 받지 않습니다. 등급 계산은 이 기기 안에서 끝나고, 체크리스트 체크 표시는 이 기기에만 저장됩니다. 사이트 개선을 위해 어떤 지역·위기를 골랐는지, 어떤 버튼을 눌렀는지는 구글 애널리틱스로 익명 통계만 모읍니다.</p>
+  <p>이름·연락처 같은 개인정보는 받지 않습니다. 등급 계산은 이 기기 안에서 끝나고, 아무것도 저장하지 않습니다. 사이트 개선을 위해 어떤 지역·위기를 골랐는지, 어떤 버튼을 눌렀는지는 구글 애널리틱스로 익명 통계만 모읍니다.</p>
   <h4>쿠팡 파트너스 안내</h4>
   <p>"이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다." 수수료는 구매 가격에 영향을 주지 않으며, 링크는 누를 때만 열립니다.</p>
   <p class="copy">© ifkr.now · <a href="https://www.instagram.com/ifkr.now/" target="_blank" rel="noopener" data-sns="instagram">인스타그램 @ifkr.now</a> · <a href="https://www.youtube.com/@ifkrnow" target="_blank" rel="noopener" data-sns="youtube">유튜브 @ifkrnow</a></p>
@@ -834,8 +834,9 @@ const STEP=[{k:'r',h:'s1',name:'사는 곳',msg:'사는 곳을 골라 주세요'
   {k:'h',h:'s3',name:'누구와',msg:'누구와 사는지 골라 주세요'},{k:'f',h:'s4',name:'층',msg:'몇 층인지 골라 주세요'}];
 
 const S = {r:null,c:null,h:null,f:null,done:new Set(),shared:false};
-try{S.done=new Set(JSON.parse(localStorage.getItem('ifkr-done')||'[]'))}catch{}
-const saveDone=()=>{try{localStorage.setItem('ifkr-done',JSON.stringify([...S.done]))}catch{}};
+// 「이미 있어요」 표시는 들어올 때마다 모두 해제된 상태로 시작 (예전에 기기에 저장된 표시도 지움, 11/16 사용자)
+try{localStorage.removeItem('ifkr-done')}catch{}
+const saveDone=()=>{};
 // 결과 링크: #r-{지역번호}-{위기}-{가구}-{층}
 const hashOf=()=>`#r-${Object.keys(R).indexOf(S.r)}-${S.c}-${S.h}-${S.f}`;
 const $ = id=>document.getElementById(id);
@@ -1100,7 +1101,7 @@ function openKit(){
     secs.push([cat,uniq(keys)])}
   const starts=new Map();secs.forEach(([cat,list])=>{if(list.length){starts.set(rows.length,cat);rows.push(...list)}});
   $('kitH').textContent=`${CRISIS[S.c].short} 대비 생존 물품 ${rows.length}가지`;
-  $('kitSub').textContent=`${S.r} · ${HOME[S.h].name} · ${FLOOR[S.f]} 기준으로 골랐어요. 이미 있는 건 「이미 있어요」를 눌러 두면 다음에도 기억해요.`;
+  $('kitSub').textContent=`${S.r} · ${HOME[S.h].name} · ${FLOOR[S.f]} 기준으로 골랐어요. 이미 있는 건 「이미 있어요」를 눌러 구분해 보세요.`;
   $('kitList').innerHTML='';
   rows.forEach((t,i)=>{if(starts.has(i)){const h=document.createElement('li');h.className='kitsec';h.textContent=starts.get(i);$('kitList').append(h)}
     const [need,why]=DETAIL[t]||['',''],li=document.createElement('li'),have=S.done.has(t);
