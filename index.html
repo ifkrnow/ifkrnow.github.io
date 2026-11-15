@@ -9,6 +9,9 @@
 <meta property="og:description" content="전쟁·폭격·정전·지진·독가스, 우리 집은 버틸 수 있을까? 10초 진단">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ifkrnow.github.io/">
+<!-- GA4: ifkr.now 위기 시뮬레이터 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S9VCF1ZB19"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-S9VCF1ZB19');</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap">
 <style>
 /* 레이아웃: 따뜻한 검정 바탕 + IF 대한민국 프로필의 주황빛 과녁 원판 속 하얀 캐릭터가 결과를 말한다 */
@@ -122,17 +125,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .place{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px;display:grid;gap:10px}
 .place div{display:flex;justify-content:space-between;gap:12px;font-size:15px}.place small{color:var(--sub);white-space:nowrap}
 .note{font-size:13px;color:var(--sub);margin-top:8px}
-.sheetbtn{width:100%;min-height:56px;border:1px solid var(--line);border-radius:14px;background:var(--card);text-align:left;padding:14px 16px;font-size:15px}
-.sheetbtn b{display:block;font-size:16px}
 .story img{width:100%;border-radius:14px;border:1px solid var(--line);display:block}
 .row2{display:flex;gap:8px;margin-top:10px}.row2 button{flex:1;min-height:48px;border:1px solid var(--line);border-radius:12px}
 .fix{margin-top:36px;font-size:13px;line-height:1.6;color:var(--sub);border-top:1px solid var(--line);padding-top:16px;display:grid;gap:8px}
 .fix h4{font-size:13px;color:var(--fg);font-weight:700;margin-top:6px}.fix b{color:var(--fg)}.fix .copy{color:var(--dim)}
-.dim{position:fixed;inset:0;background:#000a;display:none;z-index:10}.dim.on{display:block}
-.sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:var(--card);border-radius:20px 20px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .25s;z-index:11}
-.sheet.on{transform:none}.sheet h3{font-size:19px;margin-bottom:12px}
-.prod{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:8px}
-.prod div{display:flex;justify-content:space-between;font-weight:700}.prod p{font-size:14px;color:var(--sub);margin-top:4px}
 .toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:12}
 .toast.on{opacity:1}
 .pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
@@ -209,11 +205,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <a href="https://www.safekorea.go.kr" target="_blank" rel="noopener"><b>국민재난안전포털</b>내 주변 민방위·지진 대피소 찾기</a>
     <a href="https://www.e-gen.or.kr" target="_blank" rel="noopener"><b>응급의료포털 E-Gen</b>지금 문 연 응급실 찾기</a>
     <div><b>안전디딤돌 앱</b>앱스토어·플레이스토어에서 「안전디딤돌」 검색 · 재난문자와 대피소를 한곳에서</div>
-    <div><b>긴급 전화</b>화재·구조·응급 <strong>119</strong> · 범죄 <strong>112</strong></div>
   </div>
-
-  <h2>더 준비하고 싶다면</h2>
-  <button class="sheetbtn" id="openSheet"><b>상세 리포트 · 맞춤 비상키트 보기</b><span id="sheetSub">내 동네·가구 기준으로 정리한 구성</span></button>
 
   <h2>스토리 카드</h2>
   <div class="story"><img id="cardImg" alt="결과 스토리 카드 미리보기"></div>
@@ -226,7 +218,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <h4>꼭 읽어 주세요</h4>
   <p>이 사이트의 등급·점수·순위는 <b>실제 안전 등급이 아닙니다.</b> 공개된 지리·인프라 특성을 바탕으로 ifkr.now가 정한 계수를 넣어 돌린 <b>시뮬레이션 결과</b>이며, 실제 재난 피해나 정부·전문기관의 판단과 다를 수 있습니다. 특정 지역을 깎아내리거나 불안을 키우려는 목적이 없습니다.</p>
   <p>실제 재난 상황에서는 재난문자와 정부·지자체 공식 안내(안전디딤돌 앱, 국민재난안전포털)를 항상 먼저 따르세요.</p>
-  <p>고른 내용은 서버로 보내지 않고 이 기기 안에서만 계산합니다. 체크리스트 체크 표시만 이 기기에 저장됩니다.</p>
+  <p>이름·연락처 같은 개인정보는 받지 않습니다. 등급 계산은 이 기기 안에서 끝나고, 체크리스트 체크 표시는 이 기기에만 저장됩니다. 사이트 개선을 위해 어떤 지역·위기를 골랐는지, 어떤 버튼을 눌렀는지는 구글 애널리틱스로 익명 통계만 모읍니다.</p>
   <h4>쿠팡 파트너스 안내</h4>
   <p>이 사이트의 일부 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다. 수수료는 구매 가격에 영향을 주지 않으며, 링크는 누를 때만 열립니다.</p>
   <p class="copy">© ifkr.now</p>
@@ -238,15 +230,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 </div></div>
 
 <div class="scan" id="scan"><div class="scanbox" id="scanChar" aria-hidden="true"></div><div class="t" id="scanT">동네 스캔 중…</div></div>
-<div class="dim" id="dim"></div>
-<div class="sheet" id="sheet" role="dialog" aria-label="상품 구성">
-  <h3>내 동네 맞춤 준비</h3>
-  <div class="prod"><div><span>상세 생존 리포트 (12p PDF)</span><span>9,900원</span></div><p>대피 동선·72시간 시간표·가구별 준비물</p></div>
-  <div class="prod"><div><span>가구 맞춤 비상키트</span><span>19,900원부터</span></div><p>지금 본 체크리스트 그대로 담아 배송</p></div>
-  <div class="prod"><div><span>특보 알림 구독</span><span>월 2,900원</span></div><p>내 지역 특보·체크리스트 갱신 알림</p></div>
-  <p class="note">프로토타입이라 결제는 아직 연결되지 않았습니다.</p>
-  <div class="row2"><button id="closeSheet">닫기</button></div>
-</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -461,40 +444,40 @@ const CHECK = {
 // 체크리스트 문장 → 검색어(kw) + 파트너스 링크(url). url에 파트너스에서 만든 링크(https://link.coupang.com/a/...)를 넣으면 수수료 링크가 된다.
 // url이 비어 있으면 쿠팡 일반 검색으로 연결(수수료 없음, 동작 확인용). 살 수 없는 항목(행동·확인)은 여기 넣지 않는다.
 const COUPANG = {
-  '물 1인 하루 3L × 3일치':{kw:'생수 2L',url:''},
-  '휴대용 라디오 · 보조배터리':{kw:'재난용 라디오',url:''},
-  '상비약 · 처방약 7일치':{kw:'가정용 구급함',url:''},
-  '마스크 · 젖은 수건 (연기·분진)':{kw:'KF94 마스크',url:''},
-  '손전등 · 여분 건전지':{kw:'LED 손전등',url:''},
-  '조리 없이 먹는 비상식량 3일치':{kw:'비상식량',url:''},
-  '랜턴 (촛불 대신, 화재 예방)':{kw:'LED 랜턴',url:''},
-  '휴대용 버너 · 가스':{kw:'휴대용 가스버너',url:''},
-  '보온담요 · 핫팩':{kw:'은박 보온담요',url:''},
-  '큰 가구·냉장고 고정':{kw:'가구 전도방지',url:''},
-  '신발 · 장갑을 머리맡에':{kw:'작업용 장갑',url:''},
-  '호루라기 (구조 요청)':{kw:'호루라기',url:''},
-  '소화기 위치 확인':{kw:'가정용 소화기',url:''},
-  '젖은 수건 · 낮은 자세로 연기 피하기':{kw:'화재 대피 마스크',url:''},
-  '방독면 또는 마스크 · 젖은 수건':{kw:'방독면',url:''},
-  '창문·문틈 막을 테이프 · 비닐':{kw:'문풍지 테이프',url:''},
-  '포장된 물·음식 먹기':{kw:'생수 2L',url:''},
-  '방수 가방에 신분증·약':{kw:'방수 가방',url:''},
-  '마스크·젖은 수건으로 연기 막기':{kw:'KF94 마스크',url:''},
-  '마스크 2주치':{kw:'KF94 마스크',url:''},
-  '해열제 · 체온계':{kw:'체온계',url:''},
-  '2주 버틸 식량 · 생필품':{kw:'비상식량',url:''},
-  '도어락 비상 열쇠·건전지 확인':{kw:'AA 건전지',url:''},
-  '중요한 사진·파일 오프라인 백업':{kw:'외장하드',url:''},
-  '아이 이름·연락처 이름표':{kw:'미아방지 팔찌',url:''},
-  '기저귀 · 분유 · 아이 간식 3일치':{kw:'분유 스틱',url:''},
-  '보청기·안경 여분 · 지팡이':{kw:'보청기 건전지',url:''},
-  '이동장 · 목줄 · 인식표':{kw:'반려동물 이동장',url:''},
-  '사료 · 물 3일치':{kw:'사료 소포장',url:''}
+  '물 1인 하루 3L × 3일치':{kw:'생수 2L',url:'https://link.coupang.com/a/iHsuw49Elg'},
+  '휴대용 라디오 · 보조배터리':{kw:'재난용 라디오',url:'https://link.coupang.com/a/iHsxh4cJaK'},
+  '상비약 · 처방약 7일치':{kw:'가정용 구급함',url:'https://link.coupang.com/a/iHsxmKRYmO'},
+  '마스크 · 젖은 수건 (연기·분진)':{kw:'KF94 마스크',url:'https://link.coupang.com/a/iHsxri4L6a'},
+  '손전등 · 여분 건전지':{kw:'LED 손전등',url:'https://link.coupang.com/a/iHsxvYACYe'},
+  '조리 없이 먹는 비상식량 3일치':{kw:'비상식량',url:'https://link.coupang.com/a/iHsxAAXmzQ'},
+  '랜턴 (촛불 대신, 화재 예방)':{kw:'LED 랜턴',url:'https://link.coupang.com/a/iHsxFoL6sK'},
+  '휴대용 버너 · 가스':{kw:'휴대용 가스버너',url:'https://link.coupang.com/a/iHsxJPLS32'},
+  '보온담요 · 핫팩':{kw:'은박 보온담요',url:'https://link.coupang.com/a/iHsxOwIJoa'},
+  '큰 가구·냉장고 고정':{kw:'가구 전도방지',url:'https://link.coupang.com/a/iHsxS3dWk8'},
+  '신발 · 장갑을 머리맡에':{kw:'작업용 장갑',url:'https://link.coupang.com/a/iHsxXRdetE'},
+  '호루라기 (구조 요청)':{kw:'호루라기',url:'https://link.coupang.com/a/iHsx2lIfIq'},
+  '소화기 위치 확인':{kw:'가정용 소화기',url:'https://link.coupang.com/a/iHsx62E52y'},
+  '젖은 수건 · 낮은 자세로 연기 피하기':{kw:'화재 대피 마스크',url:'https://link.coupang.com/a/iHsybAGX4S'},
+  '방독면 또는 마스크 · 젖은 수건':{kw:'방독면',url:'https://link.coupang.com/a/iHsygdW1Ia'},
+  '창문·문틈 막을 테이프 · 비닐':{kw:'문풍지 테이프',url:'https://link.coupang.com/a/iHsykPDTCC'},
+  '포장된 물·음식 먹기':{kw:'생수 2L',url:'https://link.coupang.com/a/iHsuw49Elg'},
+  '방수 가방에 신분증·약':{kw:'방수 가방',url:'https://link.coupang.com/a/iHsypy78jA'},
+  '마스크·젖은 수건으로 연기 막기':{kw:'KF94 마스크',url:'https://link.coupang.com/a/iHsxri4L6a'},
+  '마스크 2주치':{kw:'KF94 마스크',url:'https://link.coupang.com/a/iHsxri4L6a'},
+  '해열제 · 체온계':{kw:'체온계',url:'https://link.coupang.com/a/iHsyuk4lI4'},
+  '2주 버틸 식량 · 생필품':{kw:'비상식량',url:'https://link.coupang.com/a/iHsxAAXmzQ'},
+  '도어락 비상 열쇠·건전지 확인':{kw:'AA 건전지',url:'https://link.coupang.com/a/iHsyyKuWBw'},
+  '중요한 사진·파일 오프라인 백업':{kw:'외장하드',url:'https://link.coupang.com/a/iHsyDoOv8K'},
+  '아이 이름·연락처 이름표':{kw:'미아방지 팔찌',url:'https://link.coupang.com/a/iHsyH04Ajk'},
+  '기저귀 · 분유 · 아이 간식 3일치':{kw:'분유 스틱',url:'https://link.coupang.com/a/iHsyMCc2YC'},
+  '보청기·안경 여분 · 지팡이':{kw:'보청기 건전지',url:'https://link.coupang.com/a/iHsyRes69c'},
+  '이동장 · 목줄 · 인식표':{kw:'반려동물 이동장',url:'https://link.coupang.com/a/iHsyVQSnoi'},
+  '사료 · 물 3일치':{kw:'사료 소포장',url:'https://link.coupang.com/a/iHsy0zKTbE'}
 };
 const shopUrl=t=>{const p=COUPANG[t];return p&&(p.url||'https://www.coupang.com/np/search?q='+encodeURIComponent(p.kw))};
 const FLCHECK = ['침수·가스 때 올라갈 위층 이웃 정해 두기','현관 말고 다른 출구(창·뒷문) 확인','계단·비상구 위치 확인','계단으로 1층까지 내려가는 시간 재 보기','피난안전구역·옥상 출입 가능 여부 확인'];
 // 지표 수집 자리: 배포 때 GA/GTM을 붙이면 dataLayer로 그대로 들어간다 (기획서 6.4)
-const track=(event,p={})=>{try{(window.dataLayer=window.dataLayer||[]).push({event,...p})}catch{}};
+const track=(event,p={})=>{try{if(event!=='page_view'&&window.gtag)gtag('event',event,p)}catch{}}; // page_view는 gtag config가 자동으로 보냄
 const STEP=[{k:'r',h:'s1',name:'사는 곳',msg:'사는 곳을 골라 주세요'},{k:'c',h:'s2',name:'위기',msg:'어떤 위기인지 골라 주세요'},
   {k:'h',h:'s3',name:'누구와',msg:'누구와 사는지 골라 주세요'},{k:'f',h:'s4',name:'층',msg:'몇 층인지 골라 주세요'}];
 
@@ -591,7 +574,6 @@ function render(){
 let curItems=[];
 function prog(items){curItems=items;const n=items.filter(t=>S.done.has(t)).length;
   $('prog').innerHTML=`<span>${items.length}개 중 ${n}개 준비 완료</span><i><u style="width:${n/items.length*100}%"></u></i>`;
-  $('sheetSub').textContent=n<items.length?`아직 준비 안 된 ${items.length-n}개를 한 번에 챙기기`:'체크리스트 완료! 상세 대피 계획 보기';
   renderShop(items)}
 
 // 쿠팡 링크: 사용자가 직접 누를 때만 이동 (자동 이동·위장 버튼 없음 — 파트너스 부정 클릭 규정)
@@ -699,8 +681,6 @@ $('copyCap').onclick=async()=>{
   track('caption_copy');
   try{await navigator.clipboard.writeText(t);toast('캡션을 복사했어요')}catch{toast('복사가 막혔어요. 길게 눌러 직접 복사해 주세요')}
 };
-const sheet=on=>{$('sheet').classList.toggle('on',on);$('dim').classList.toggle('on',on)};
-$('openSheet').onclick=()=>{sheet(true);track('cta_click')};$('closeSheet').onclick=$('dim').onclick=()=>sheet(false);
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1600)}
 $('copyLink').onclick=async()=>{
   const u=location.origin+location.pathname+'?utm_source=share&utm_medium=link'+hashOf();
