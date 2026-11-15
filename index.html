@@ -89,10 +89,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .why>div:first-child h4{color:var(--brand2)}
 .why ul{list-style:none;display:grid;gap:4px;font-size:15px}.why li::before{content:'· ';color:var(--dim)}
 .why p{grid-column:1/-1;font-size:13px;color:var(--sub)}
-.cmp{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.cmp button{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px 2px;min-height:72px}
-.cmp button[aria-pressed=true]{border-color:var(--brand)}
-.cmp b{display:block;font-family:var(--disp);font-weight:400;font-size:28px;line-height:1.15}.cmp span{font-size:12px;color:var(--sub)}
 .check{list-style:none;display:grid;gap:6px}
 .check li button{width:100%;min-height:48px;display:flex;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px 14px;font-size:15px}
 .check li button::before{content:'';flex:none;width:20px;height:20px;border:2px solid var(--dim);border-radius:6px}
@@ -160,8 +156,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <div><span>층</span><div class="chips" id="chipF"></div></div>
   </div>
 
-  <h2>같은 집, 다른 위기</h2>
-  <div class="cmp" id="cmp"></div>
 
   <h2 id="whyH">왜 이 등급?</h2>
   <div class="why" id="why"></div>
@@ -530,10 +524,6 @@ function render(){
   $('whyH').textContent=`왜 ${eun(S.r)} ${g}등급?`;
   $('why').innerHTML=`<div><h4>불리한 점</h4><ul>${li(bad)}</ul></div><div><h4>버티는 점</h4><ul>${li(good)}</ul></div>
     <p>층·가구 조건: ${FLOOR[S.f]} ${CRISIS[S.c].fl[S.f]>0?'+':CRISIS[S.c].fl[S.f]<0?'−':'±'}${Math.abs(CRISIS[S.c].fl[S.f])}점, ${HOME[S.h].name} ${HOME[S.h].adj>=0?'+':'−'}${Math.abs(HOME[S.h].adj)}점</p>`;
-  $('cmp').innerHTML='';
-  Object.entries(CRISIS).forEach(([k,c])=>{const s=scoreOf(S.r,k,S.h),b=document.createElement('button');
-    b.setAttribute('aria-pressed',k===S.c);b.innerHTML=`<b>${gradeOf(s)}</b><span>${c.short}</span>`;
-    b.onclick=()=>{S.c=k;render();scrollTo({top:0,behavior:'smooth'})};$('cmp').append(b)});
   const items=[...CHECK.base,...CHECK[S.c],...CHECK[S.h],FLCHECK[S.f]];
   $('check').innerHTML='';
   items.forEach(t=>{const li=document.createElement('li'),b=document.createElement('button');b.textContent=t;
@@ -622,11 +612,9 @@ async function drawCard(sc,g){
     const y=1300+i*50;x.font=`700 32px ${F}`;x.fillStyle=i?(String(k).includes('−')?'#ff8a2c':fg):'#ff8a2c';x.fillText(k,L,y);const kw=x.measureText(k+'  ').width;
     x.font=`500 32px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y)});
   x.fillStyle='#2e2926';x.fillRect(L,1428,RX-L,2);
-  const others=Object.entries(CRISIS).filter(([k])=>k!==S.c).map(([k,c])=>`${c.short} ${gradeOf(scoreOf(S.r,k,S.h))}`);
-  x.font=`600 32px ${F}`;x.fillStyle=sub;x.fillText('같은 집, 다른 위기',L,1484);x.fillStyle=fg;x.font=`700 38px ${F}`;
-  x.fillText(others.slice(0,5).join('  '),L,1538);x.fillText(others.slice(5).join('  '),L,1590);
-  x.font=`400 60px ${D}`;x.fillStyle=fg;x.fillText('너네 동네는 몇 등급?',L,1672);
-  x.font=`500 32px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now 프로필 링크 · 공식 등급 아님',L,1720);
+  // 다른 위기 등급은 일부러 안 보여 줌 → 직접 들어와서 돌려 보게
+  x.font=`400 64px ${D}`;x.fillStyle=fg;x.fillText('너네 동네는 몇 등급?',L,1530);
+  x.font=`500 32px ${F}`;x.fillStyle=sub;x.fillText('@ifkr.now 프로필 링크 · 공식 등급 아님',L,1584);
   cv.toBlob(b=>{if(seq!==cardSeq)return;cardBlob=b;$('cardImg').src=URL.createObjectURL(b);$('cardImg').classList.remove('busy')},'image/png');
 }
 $('introChar').innerHTML=charSVG('C');$('scanChar').innerHTML=charSVG('C');
