@@ -174,9 +174,11 @@ try:
         t = e.get('tags', {}); nm = t.get('name')
         if not nm: continue
         if t.get('highway') == 'motorway_junction':
+            nm = re.sub(r'\s*\([^)]*\)', '', nm).strip()  # 동둔내IC(하이패스) → 동둔내IC
             if re.search(r'(JC|JCT|분기점|교차로)$', nm): continue  # 고속도로끼리 갈라지는 곳은 나가는 길이 아님
             IC.append((e['lat'], e['lon'], nm if re.search(r'(IC|나들목|TG)$', nm) else nm + ' 나들목'))
         elif t.get('railway') == 'station' and (t.get('station') in ('subway', 'light_rail') or t.get('subway') == 'yes' or t.get('train') == 'yes' or 'station' not in t):
+            nm = re.sub(r'\([^)]*[一-鿿][^)]*\)', '', nm).strip()  # 오현역(梧峴驛) → 오현역
             ST.append((e['lat'], e['lon'], nm if nm.endswith('역') else nm + '역', t.get('station') in ('subway', 'light_rail') or t.get('subway') == 'yes'))
 except FileNotFoundError: pass
 print('stations', len(ST), 'ic', len(IC))
