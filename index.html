@@ -764,7 +764,6 @@ const val = (v,k)=>{const x=v[KEYS.indexOf(k)]; return (k==='iso'||k==='load')?1
 const gradeOf = s=>s>=80?'S':s>=65?'A':s>=50?'B':s>=35?'C':'D'; // 점수 구간 그대로 (실제 자료 반영 뒤 11/16 재설정)
 const scoreOf = (r,c,h,fl=S.f)=>Math.round(CRISIS[c].f(R[r])+HOME[h].adj+CRISIS[c].fl[fl]);
 // ── 동 단위 보정 (dong.json 행: [동, 인구, 면적km², 대피소 수, 수용 인원, 종합병원 km, 병원 번호, 구, 공동주택%, 노후주택%]) ──
-// ponytail: 결과 링크의 동은 dong.json 안 순번(-d12) → dong.json을 다시 만들면 순번이 바뀔 수 있음. 바꿀 땐 행정동 코드로.
 let DG=null,DGP=null,QD={};
 const loadDG=()=>DGP||(DGP=fetch('dong.json').then(r=>r.ok?r.json():null).then(j=>{if(!j)return null;j.t={};
   for(const [r,rows] of Object.entries(j.d)){let p=0,c=0,a=0;rows.forEach(x=>{if(x[1]>0){p+=x[1];c+=x[4];a+=x[2]}});j.t[r]={p,c,a,n:rows.filter(x=>x[1]>0).length}}
@@ -989,7 +988,7 @@ const S = {r:null,d:null,c:null,h:null,f:null,done:new Set(),shared:false};
 try{localStorage.removeItem('ifkr-done')}catch{}
 const saveDone=()=>{};
 // 결과 링크: #r-{지역번호}-{위기}-{가구}-{층}
-const hashOf=()=>`#r-${Object.keys(R).indexOf(S.r)}-${S.c}-${S.h}-${S.f}${dRow()?'-d'+S.d:''}`;
+const hashOf=()=>`#r-${Object.keys(R).indexOf(S.r)}-${S.c}-${S.h}-${S.f}${dRow()?'-d'+dRow()[26]:''}`; // 동은 행정동 코드(자료를 다시 만들어도 안 바뀜)
 const $ = id=>document.getElementById(id);
 const opt = (label,d,on)=>{const b=document.createElement('button');b.className='opt';b.setAttribute('aria-pressed','false');
   b.innerHTML=label+(d?`<span class="d">${d}</span>`:'');b.onclick=on;return b};
@@ -1323,7 +1322,8 @@ track('page_view',{src:new URLSearchParams(location.search).get('utm_source')||'
 (async()=>{const m=location.hash.match(/^#r-(\d+)-(\w+)-(\w+)-(\d)(?:-d(\d+))?$/),r=m&&Object.keys(R)[+m[1]];
   if(!r||!CRISIS[m[2]]||!HOME[m[3]]||!FLOOR[+m[4]])return;
   if(m[5]!=null)await loadDG(); // 동까지 고른 결과 링크면 동 자료를 먼저 받음
-  Object.assign(S,{r,d:m[5]!=null?+m[5]:null,c:m[2],h:m[3],f:+m[4],shared:true,friend:r});render();showResult();track('friend_view',{region:r})})();
+  const di=m[5]==null||!DG?.d[r]?-1:m[5].length>=8?DG.d[r].findIndex(x=>x[26]===m[5]):+m[5]; // 행정동 코드(예전 순번 링크도 받음)
+  Object.assign(S,{r,d:di>=0&&DG?.d[r]?.[di]?di:null,c:m[2],h:m[3],f:+m[4],shared:true,friend:r});render();showResult();track('friend_view',{region:r})})();
 </script>
 </body>
 </html>

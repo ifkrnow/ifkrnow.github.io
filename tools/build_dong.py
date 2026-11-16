@@ -214,9 +214,9 @@ for d in D:
         e65, kid, SOLO.get(d['code'], -1), d['ele'], d['rel'], d['low'], d['sea'],
         ni[s[2]] if s else -1, round(sk, 1), (1 if s and s[3] else 0), ni[ic[2]] if ic else -1, round(ik, 1),
         sum(n for _, n in AM[d['code']]) if AM[d['code']] else (0 if (d['sido'], sggN(d['sgg'])) in BJ else -1),  # 그 시군구 목록에 없으면 0곳
-        '·'.join(b for b, _ in AM[d['code']] if claim[(d['sido'], d['sgg'], b)] > 1), round(d['cy'], 5), round(d['cx'], 5)])
+        '·'.join(b for b, _ in AM[d['code']] if claim[(d['sido'], d['sgg'], b)] > 1), round(d['cy'], 5), round(d['cx'], 5), d['code']])
 print('sgis matched', nsg, '/', len(D))
-# 행: [0동 1인구 2면적 3대피소수 4수용 5병원km 6병원 7구 8공동주택% 9노후% 10고령% 11어린이% 12 1인세대% 13평균고도m 14고저차m 15저지대% 16바다km 17역 18역km 19지하철? 20나들목 21나들목km 22아파트단지수(K-apt, 없으면 -1) 23나눠 쓰는 법정동 이름(있으면 「○○동 일대」) 24위도 25경도(동 면적 무게중심)]
+# 행: [0동 1인구 2면적 3대피소수 4수용 5병원km 6병원 7구 8공동주택% 9노후% 10고령% 11어린이% 12 1인세대% 13평균고도m 14고저차m 15저지대% 16바다km 17역 18역km 19지하철? 20나들목 21나들목km 22아파트단지수(K-apt, 없으면 -1) 23나눠 쓰는 법정동 이름(있으면 「○○동 일대」) 24위도 25경도(동 면적 무게중심) 26행정동코드(결과 링크용)]
 json.dump({'h': names, 'd': out}, open('dong.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 miss = [r for r in REGIONS if r not in out]
 print('regions', len(out), 'missing', miss, 'dongs', sum(map(len, out.values())), 'hosp', len(H))
