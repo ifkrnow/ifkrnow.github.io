@@ -95,6 +95,11 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 .shrow .act{display:flex;gap:6px}.shrow .act a{flex:1;text-align:center;min-height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--fg);text-decoration:none}
 .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
 .grid5 .opt{min-height:38px;padding:5px 2px;font-size:14px}
+.subh{display:flex;align-items:center;gap:10px;margin-top:4px}.subh b{font-size:17px}
+.sublink{min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--sub);font-size:14px}
+.subgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:6px;margin-top:10px}
+.subgrid .opt{min-height:40px;padding:5px 4px;font-size:14px;word-break:keep-all}
+.skip{width:100%;min-height:44px;margin-top:10px;border:1px dashed var(--line);border-radius:12px;background:none;color:var(--sub);font-size:14px}
 #input .intro{grid-template-columns:1fr 80px;margin-top:6px}
 #input h1{font-size:24px}
 #input .tease{margin-top:4px;font-size:14px}
@@ -209,6 +214,8 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
     <input class="search" id="q" type="search" placeholder="지역·동 검색 (예: 탄방동)" autocomplete="off" aria-label="지역 검색">
     <p class="note" id="qhint" hidden></p>
     <div id="regions"></div>
+    <div id="sub" hidden><div class="subh"><button type="button" class="sublink" id="subBack">‹ 이전</button><b id="subT"></b></div>
+      <div class="subgrid" id="subOpts"></div><button type="button" class="skip" id="subSkip"></button></div>
     <p class="note">우리 동네가 없나요? 가까운 곳을 고르고, <b>@ifkr.now</b> 댓글로 알려주시면 추가할게요.</p>
   </section>
   <section class="step" id="st2" hidden>
@@ -950,22 +957,37 @@ const opt = (label,d,on)=>{const b=document.createElement('button');b.className=
   b.innerHTML=label+(d?`<span class="d">${d}</span>`:'');b.onclick=on;return b};
 // ── 입력은 한 단계씩: 고르면 다음 단계로 넘어가고, 4단계를 고르면 바로 진단 ──
 let step=1;
-const label=k=>k==='r'?S.r:k==='c'?CRISIS[S.c]?.short:k==='h'?HOME[S.h]?.name:FLOOR[S.f];
+const label=k=>k==='r'?place():k==='c'?CRISIS[S.c]?.short:k==='h'?HOME[S.h]?.name:FLOOR[S.f];
 function renderBar(){
   $('stepbar').innerHTML=`<div class="dots">${STEP.map((s,i)=>`<i class="${i+1===step?'on':S[s.k]!==null?'done':''}"></i>`).join('')}<span>${step} / 4</span></div>`+
     (step>1?`<div class="picked">${STEP.slice(0,step-1).map((s,i)=>`<button data-go="${i+1}">${esc(label(s.k))}</button>`).join('<b>›</b>')}</div>`:'');
   $('stepbar').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>showStep(+b.dataset.go)); // 고른 것을 누르면 그 단계로 돌아감
 }
-function showStep(n){step=n;$('menu').hidden=true;document.body.classList.remove('has-menu');[1,2,3,4].forEach(i=>$('st'+i).hidden=i!==n);$('introBox').hidden=n>1;document.querySelector('footer').hidden=true;renderBar();updateCTA();scrollTo(0,0)}
+function showStep(n){step=n;closeSub();$('menu').hidden=true;document.body.classList.remove('has-menu');[1,2,3,4].forEach(i=>$('st'+i).hidden=i!==n);$('introBox').hidden=n>1;document.querySelector('footer').hidden=true;renderBar();updateCTA();scrollTo(0,0)}
 function updateCTA(){if(!$('result').hidden)return;const cur=STEP[step-1],ok=S[cur.k]!==null;
   $('go').classList.toggle('wait',!ok);$('go').textContent=!ok?cur.msg:step<4?'다음':'10초 진단 시작';
   $('back').hidden=step===1;$('back').textContent='이전'}
 function pick(box,btn,adv=true){box.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===btn));updateCTA();
   if(adv)setTimeout(()=>step<4?showStep(step+1):start(),220)} // 살짝 눌린 걸 보여 준 뒤 넘어감
 
+// 지역을 누르면 구 → 동 순서로 고름 (구가 하나뿐인 시·군은 바로 동). 동은 건너뛸 수 있음
+const gName=g=>g.replace(/^\S+?시(?=\S+구$)/,''); // 수원시장안구 → 장안구
+function openSub(r,g=null){const rows=DG.d[r],gs=[...new Set(rows.filter(x=>x[1]>0).map(x=>x[7]))],many=gs.length>1;
+  if(g==null&&!many)g=gs[0];
+  ['q','qhint','regions'].forEach(id=>$(id).hidden=true);$('sub').hidden=false;
+  $('subT').textContent=g?`${r}${many?' '+gName(g):''} · 동네 고르기`:`${r} · 구 고르기`;
+  const box=$('subOpts');box.innerHTML='';
+  if(!g)gs.forEach(x=>box.append(opt(gName(x),'',()=>openSub(r,x))));
+  else rows.forEach((x,i)=>{if(x[7]!==g||!x[1])return;const b=opt(esc(x[0]),'',()=>{S.d=i;track('dong_pick',{region:r,on:true,from:'step1'});pick(box,b)});b.setAttribute('aria-pressed',S.d===i);box.append(b)});
+  $('subSkip').textContent=`동네는 건너뛸게요 · ${r} 전체로 보기`;
+  $('subSkip').onclick=()=>{S.d=null;showStep(2)};
+  $('subBack').textContent=g&&many?'‹ 구 다시':'‹ 지역 다시';
+  $('subBack').onclick=()=>g&&many?openSub(r):closeSub();
+  scrollTo(0,0)}
+function closeSub(){if(!$('sub')||$('sub').hidden)return;$('sub').hidden=true;$('q').hidden=$('regions').hidden=false}
 // 한 화면에 다 들어오게 권역 머리글 없이 5칸 격자 (순서는 권역 순 그대로, 찾기는 검색창으로)
 {const grid=document.createElement('div');grid.className='grid5';
-  Object.values(GROUP).flat().forEach(r=>{const b=opt(r,'',()=>{S.r=r;S.d=QD[r]??null;pick($('regions'),b)});b.dataset.r=r;grid.append(b)});$('regions').append(grid)}
+  Object.values(GROUP).flat().forEach(r=>{const b=opt(r,'',()=>{S.r=r;S.d=QD[r]??null;if(S.d==null&&DG&&DG.d[r]){$('regions').querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===b));updateCTA();openSub(r)}else pick($('regions'),b)});b.dataset.r=r;grid.append(b)});$('regions').append(grid)}
 Object.entries(CRISIS).forEach(([k,c])=>{const b=opt(c.name,c.d,()=>{S.c=k;pick($('crises'),b)});$('crises').append(b)});
 Object.entries(HOME).forEach(([k,h])=>{const b=opt(h.name,h.d,()=>{S.h=k;pick($('homes'),b)});$('homes').append(b)});
 FLOOR.forEach((n,i)=>{const b=opt(n,'',()=>{S.f=i;pick($('floors'),b)});$('floors').append(b)});
