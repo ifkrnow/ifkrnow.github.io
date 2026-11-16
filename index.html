@@ -182,6 +182,11 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
 @media (prefers-reduced-motion:reduce){.pop,.scanbox::after{animation:none}}
 [hidden]{display:none!important}
+.dongbox{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.dongbox b{display:block;font-size:16px}.dongbox p{color:var(--sub);font-size:13px;margin:4px 0 10px}
+.dongopts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.dongopts:empty{display:none}
+.dongopts button{min-height:40px;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:14px}
+.dongopts button[aria-pressed=true]{background:var(--fg);color:var(--bg)}.dongopts .note{color:var(--sub);font-size:13px}
 </style>
 </head>
 <body>
@@ -201,7 +206,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 
   <section class="step" id="st1">
     <h2 id="s1"><em>1</em>사는 곳</h2>
-    <input class="search" id="q" type="search" placeholder="지역 검색 (예: 평택)" autocomplete="off" aria-label="지역 검색">
+    <input class="search" id="q" type="search" placeholder="지역·동 검색 (예: 탄방동)" autocomplete="off" aria-label="지역 검색">
     <p class="note" id="qhint" hidden></p>
     <div id="regions"></div>
     <p class="note">우리 동네가 없나요? 가까운 곳을 고르고, <b>@ifkr.now</b> 댓글로 알려주시면 추가할게요.</p>
@@ -223,6 +228,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 <main id="result" hidden>
   <div class="friend" id="friend" hidden><b>친구가 보낸 결과예요</b>내 동네는 몇 등급일까? 아래 버튼으로 10초 진단</div>
   <div class="story"><img id="cardImg" alt="결과 스토리 카드"></div>
+  <div class="dongbox" id="dongBox" hidden><b id="dongH">동까지 고르면 등급이 달라져요</b><p id="dongSub"></p><input class="search" id="dongQ" placeholder="동 이름 또는 구 이름 (예: 탄방동)" autocomplete="off"><div class="dongopts" id="dongOpts"></div></div>
   <div class="sharebox" id="shareBox">
     <button id="saveCard" class="send">카드 저장 · 인스타 스토리 올리기</button>
     <a class="igbtn" href="https://www.instagram.com/ifkr.now/" target="_blank" rel="noopener" data-sns="instagram">인스타 @ifkr.now 팔로우 · 다른 위기 영상 보기</a>
@@ -271,6 +277,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
   <p><b>재미로 보는 시뮬레이션입니다. 결과를 맹신하지 마세요.</b> 이 사이트의 등급·점수·순위는 <b>실제 안전 등급이 아닙니다.</b> 공개 자료와 ifkr.now가 정한 계수를 같은 공식으로 계산한 <b>시뮬레이션 결과</b>이며, 실제 재난 피해나 정부·전문기관의 판단과 다를 수 있습니다. 특정 지역을 깎아내리거나 불안을 키우려는 목적이 없습니다.</p>
   <h4>점수는 이렇게 계산해요</h4>
   <p>지역마다 9가지 지표(0~100)에 위기별 가중치를 곱해 더하고, 가구·층 조건 점수를 더하고 뺍니다. 이 중 4가지는 <b>공개 자료로 계산</b>합니다. ① 타격 거리 = 시청에서 군사분계선까지 직선거리 60% + 주요 군사·국가 시설 수 40% ② 원전 거리 = 가장 가까운 원전까지 직선거리 ③ 대피 인프라 = 주민 1명당 민방위 대피소 수용 인원(행정안전부) ④ 인구 밀집 = 인구 밀도(2024년 말 인구·면적 근삿값). 회복력·지형·보급 속도·해안·산불 5가지는 지역 특성을 보고 ifkr.now가 정한 값입니다. 등급은 S 80점 이상, A 65, B 50, C 35, D 그 아래입니다.</p>
+  <p>동까지 고르면 그 동의 자료로 ±10점 안에서 더하고 뺍니다. 주민 1명당 민방위 대피소 수용 인원(행정안전부 민방위대피시설·행정동 주민등록 인구 2026년 10월), 가장 가까운 종합병원까지 직선거리(건강보험심사평가원 병의원 현황 2026년 9월), 도시 평균과 비교한 인구 밀도, 공동주택·노후주택 비율(통계청 SGIS 살고싶은 우리동네 2022, 10% 구간)입니다. 동 경계는 통계청 SGIS 행정동 경계(vuski/admdongkor 가공, CC BY 4.0)를 썼습니다.</p>
   <p>실제 재난 상황에서는 재난문자와 정부·지자체 공식 안내(안전디딤돌 앱, 국민재난안전포털)를 항상 먼저 따르세요.</p>
   <p>이름·연락처 같은 개인정보는 받지 않습니다. 등급 계산은 이 기기 안에서 끝나고, 아무것도 저장하지 않습니다. 사이트 개선을 위해 어떤 지역·위기를 골랐는지, 어떤 버튼을 눌렀는지는 구글 애널리틱스로 익명 통계만 모읍니다.</p>
   <h4>쿠팡 파트너스 안내</h4>
@@ -708,7 +715,7 @@ const factsOf=(r,c,sign)=>{const sp=[],gen=[];for(const s of FAC[r].f){const i=s
   if([...tags].some(x=>CT[c].includes(x)))sp.push(t);else if(tags.includes('h'))gen.push(t)}return [...sp,...gen]};
 const whyOf=()=>{let [xb,xg]=WHYX[S.c]?WHYX[S.c](S.r):[null,null];
   const fb=factsOf(S.r,S.c,'-');if(xb&&xb.includes('원전')&&fb.some(t=>t.includes('원전')))xb=null; // 같은 말 두 번 안 하게
-  const bad=[xb,...fb].filter(Boolean).slice(0,3),good=[xg,...factsOf(S.r,S.c,'+')].filter(Boolean).slice(0,3);
+  const de=dongEval(S.r,S.c,S.d),bad=[...de.bad,xb,...fb].filter(Boolean).slice(0,3),good=[...de.good,xg,...factsOf(S.r,S.c,'+')].filter(Boolean).slice(0,3);
   // 이 위기에 맞는 사실이 없으면 계수로 한 줄 (값이 애매하면 과장하지 않는 문장)
   const ax=CRISIS[S.c].ax.map(([k])=>[k,val(R[S.r],k)]).sort((p,q)=>p[1]-q[1]);
   const own=k=>['nuke','coast','forest'].includes(k); // 원전·해안·산림은 지역 사실 줄이 이미 말함
@@ -743,6 +750,36 @@ const KEYS = ['war','infra','terrain','shelter','iso','load','nuke','coast','for
 const val = (v,k)=>{const x=v[KEYS.indexOf(k)]; return (k==='iso'||k==='load')?100-x:x}; // 높을수록 좋음으로 통일
 const gradeOf = s=>s>=80?'S':s>=65?'A':s>=50?'B':s>=35?'C':'D'; // 점수 구간 그대로 (실제 자료 반영 뒤 11/16 재설정)
 const scoreOf = (r,c,h,fl=S.f)=>Math.round(CRISIS[c].f(R[r])+HOME[h].adj+CRISIS[c].fl[fl]);
+// ── 동 단위 보정 (dong.json 행: [동, 인구, 면적km², 대피소 수, 수용 인원, 종합병원 km, 병원 번호, 구, 공동주택%, 노후주택%]) ──
+// ponytail: 결과 링크의 동은 dong.json 안 순번(-d12) → dong.json을 다시 만들면 순번이 바뀔 수 있음. 바꿀 땐 행정동 코드로.
+let DG=null,DGP=null,QD={};
+const loadDG=()=>DGP||(DGP=fetch('dong.json').then(r=>r.ok?r.json():null).then(j=>{if(!j)return null;j.t={};
+  for(const [r,rows] of Object.entries(j.d)){let p=0,c=0,a=0;rows.forEach(x=>{if(x[1]>0){p+=x[1];c+=x[4];a+=x[2]}});j.t[r]={p,c,a,n:rows.filter(x=>x[1]>0).length}}
+  return DG=j}).catch(()=>null));
+const dRow=(r=S.r,i=S.d)=>DG&&i!=null&&DG.d[r]?DG.d[r][i]||null:null;
+const clip=(x,a)=>Math.max(-a,Math.min(a,x));
+const dongEval=(r,c,i)=>{const x=dRow(r,i),bad=[],good=[];if(!x||!x[1])return {adj:0,bad,good};
+  const [nm,pop,area,sn,sc,km,hi,,apt,old]=x,T=DG.t[r];let adj=0;
+  // 대피소: 동 주민 1명당 수용 인원을 도시 평균과 비교
+  const per=sc/pop,a1=sn?clip(Math.round(3*Math.log2(per/(T.c/T.p))),6):-6;adj+=Math.round(a1*(['war','apt','gas','nuke'].includes(c)?1:.5));
+  if(!sn)bad.push(`${nm} 안에는 민방위 대피소가 없음`);else if(a1>=2)good.push(`${nm} 대피소 ${sn}곳·1인당 ${per.toFixed(1)}명분`);else if(a1<=-2)bad.push(`${nm} 대피소 ${sn}곳·1인당 ${per.toFixed(1)}명분`);
+  // 가장 가까운 종합병원(직선거리)
+  const h=DG.h[hi],a2=km<=1.5?2:km<=3?1:km<=7?0:km<=15?-2:-4;adj+=a2;
+  if(a2>0)good.push(`${nm}→${h} ${km}km`);else if(a2<0)bad.push(`${nm}→가까운 종합병원 ${km}km`);
+  // 인구 밀도: 도시 평균 대비 → 감염병·정전·먹통은 붐빌수록, 산불은 한적할수록 불리
+  const dq=(pop/area)/(T.p/T.a),a3=clip(Math.round(2*Math.log2(dq)),4);
+  if(['pand','out','cyber'].includes(c)){adj-=a3;if(a3>=2)bad.push(`${nm} 인구 밀도 ${r} 평균의 ${dq.toFixed(1)}배`);else if(a3<=-2)good.push(`${nm} 사람이 ${r} 평균보다 덜 몰림`)}
+  if(c==='fire'){adj+=a3;if(a3<=-2)bad.push(`${nm} 인구 밀도 낮은 외곽`)}
+  // 공동주택·노후주택 비율 (통계청 2022, 10% 구간의 가운데 값)
+  const rg=v=>v>=95?'90%↑':v<=5?'10%↓':`${v-5}~${v+5}%`;
+  if(apt>=0&&c==='apt'){const a=-Math.round((apt-50)/12);adj+=a;if(a<=-2)bad.push(`${nm} 공동주택 ${rg(apt)}·고층 밀집`);else if(a>=2)good.push(`${nm} 공동주택 ${rg(apt)}·낮은 집`)}
+  if(apt>=0&&c==='war'){const a=Math.round((apt-50)/25);adj+=a;if(a>=2)good.push(`${nm} 공동주택 ${rg(apt)}·지하주차장`)}
+  if(old>=0&&(c==='quake'||c==='fire')){const a=-Math.round((old-55)/(c==='quake'?10:20));adj+=a;
+    if(c==='quake'&&a<=-2)bad.push(`${nm} 오래된 주택 ${rg(old)}`);else if(c==='quake'&&a>=2)good.push(`${nm} 오래된 주택 ${rg(old)}뿐`)}
+  return {adj:clip(adj,10),bad,good}};
+const myScore=(i=S.d)=>Math.max(0,Math.min(100,scoreOf(S.r,S.c,S.h)+dongEval(S.r,S.c,i).adj));
+const dongRank=()=>{const me=myScore();return [1+DG.d[S.r].filter((x,i)=>x[1]>0&&myScore(i)>me).length,DG.t[S.r].n]};
+const place=()=>dRow()?`${S.r} ${dRow()[0]}`:S.r;
 
 const CHECK = {
   base:['물 1인 하루 3L × 3일치','휴대용 라디오 · 보조배터리','현금 소액 (카드 결제 멈춤 대비)','상비약 · 처방약 7일치','가족 연락처를 종이에 적어 두기'],
@@ -902,12 +939,12 @@ const track=(event,p={})=>{try{if(event!=='page_view'&&window.gtag)gtag('event',
 const STEP=[{k:'r',h:'s1',name:'사는 곳',msg:'사는 곳을 골라 주세요'},{k:'c',h:'s2',name:'위기',msg:'어떤 위기인지 골라 주세요'},
   {k:'h',h:'s3',name:'누구와',msg:'누구와 사는지 골라 주세요'},{k:'f',h:'s4',name:'층',msg:'몇 층인지 골라 주세요'}];
 
-const S = {r:null,c:null,h:null,f:null,done:new Set(),shared:false};
+const S = {r:null,d:null,c:null,h:null,f:null,done:new Set(),shared:false};
 // 「이미 있어요」 표시는 들어올 때마다 모두 해제된 상태로 시작 (예전에 기기에 저장된 표시도 지움, 11/16 사용자)
 try{localStorage.removeItem('ifkr-done')}catch{}
 const saveDone=()=>{};
 // 결과 링크: #r-{지역번호}-{위기}-{가구}-{층}
-const hashOf=()=>`#r-${Object.keys(R).indexOf(S.r)}-${S.c}-${S.h}-${S.f}`;
+const hashOf=()=>`#r-${Object.keys(R).indexOf(S.r)}-${S.c}-${S.h}-${S.f}${dRow()?'-d'+S.d:''}`;
 const $ = id=>document.getElementById(id);
 const opt = (label,d,on)=>{const b=document.createElement('button');b.className='opt';b.setAttribute('aria-pressed','false');
   b.innerHTML=label+(d?`<span class="d">${d}</span>`:'');b.onclick=on;return b};
@@ -928,35 +965,44 @@ function pick(box,btn,adv=true){box.querySelectorAll('.opt').forEach(x=>x.setAtt
 
 // 한 화면에 다 들어오게 권역 머리글 없이 5칸 격자 (순서는 권역 순 그대로, 찾기는 검색창으로)
 {const grid=document.createElement('div');grid.className='grid5';
-  Object.values(GROUP).flat().forEach(r=>{const b=opt(r,'',()=>{S.r=r;pick($('regions'),b)});b.dataset.r=r;grid.append(b)});$('regions').append(grid)}
+  Object.values(GROUP).flat().forEach(r=>{const b=opt(r,'',()=>{S.r=r;S.d=QD[r]??null;pick($('regions'),b)});b.dataset.r=r;grid.append(b)});$('regions').append(grid)}
 Object.entries(CRISIS).forEach(([k,c])=>{const b=opt(c.name,c.d,()=>{S.c=k;pick($('crises'),b)});$('crises').append(b)});
 Object.entries(HOME).forEach(([k,h])=>{const b=opt(h.name,h.d,()=>{S.h=k;pick($('homes'),b)});$('homes').append(b)});
 FLOOR.forEach((n,i)=>{const b=opt(n,'',()=>{S.f=i;pick($('floors'),b)});$('floors').append(b)});
 $('q').oninput=e=>{const q=e.target.value.trim().replace(/(특별|광역)?시$|군$|구$|동$/,'')||e.target.value.trim();
   const via=q?Object.entries(ALIAS).filter(([a])=>a.includes(q)):[],hit=new Set(via.map(([,r])=>r));
+  // 동 이름(탄방·관저2동·화도읍)으로 찾으면 그 동이 있는 지역 + 동까지 미리 골라 둠
+  const core=t=>t.replace(/(\d+)?(동|읍|면|가)$/,''),raw=e.target.value.trim().replace(/\s+/g,'');let dh=[];
+  if(DG&&core(raw).length>=2&&!Object.keys(R).some(r=>r.includes(q))){const all=Object.entries(DG.d).flatMap(([r,rows])=>rows.map((x,i)=>[r,i,x]).filter(([,,x])=>x[1]>0));
+    dh=all.filter(([,,x])=>x[0].startsWith(raw));if(!dh.length)dh=all.filter(([,,x])=>core(x[0]).startsWith(core(raw)))}
+  // 한 도시에 맞는 동이 하나면 그 동까지, 여럿(다산1·2동)이면 도시만 고르고 동은 결과 화면에서
+  QD={};const cnt={};dh.forEach(([r,i])=>{cnt[r]=(cnt[r]||0)+1;QD[r]=i;hit.add(r)});for(const r in cnt)if(cnt[r]>1)QD[r]=null;
+  const dr=[...new Set(dh.map(d=>d[0]))];
   $('regions').querySelectorAll('.opt').forEach(b=>b.hidden=!!q&&!b.dataset.r.includes(q)&&!hit.has(b.dataset.r));
   $('regions').querySelectorAll('.grp').forEach(g=>g.hidden=![...g.querySelectorAll('.opt')].some(b=>!b.hidden));
   const none=q&&![...$('regions').querySelectorAll('.opt')].some(b=>!b.hidden);
-  $('qhint').hidden=!(via.length||none);
-  $('qhint').textContent=none?'아직 없는 지역이에요. 아래 목록에서 가까운 곳을 골라 주세요.':via.map(([a,r])=>`${eun(a)} ${r} 기준으로 계산해요`).join(' · ');
+  $('qhint').hidden=!(via.length||none||dh.length);
+  $('qhint').textContent=dh.length?(dr.length>1?dr.slice(0,4).map(r=>`${r} ${dh.find(d=>d[0]===r)[2][0]}`).join(' · ')+(dr.length>4?` 등 ${dr.length}곳`:'')+' · 아래에서 도시를 골라 주세요'
+    :dh.length===1?`${dr[0]} ${dh[0][2][0]}으로 계산해요`:`${dr[0]} ${dh.slice(0,4).map(d=>d[2][0]).join('·')} · 결과 화면에서 동을 고를 수 있어요`):none?'아직 없는 지역이에요. 아래 목록에서 가까운 곳을 골라 주세요.':via.map(([a,r])=>`${eun(a)} ${r} 기준으로 계산해요`).join(' · ');
   if(none)$('regions').querySelectorAll('.opt,.grp').forEach(el=>el.hidden=false);
   const shown=[...$('regions').querySelectorAll('.opt')].filter(b=>!b.hidden);
   if(S.r&&!shown.some(b=>b.dataset.r===S.r)){S.r=null;$('regions').querySelectorAll('.opt').forEach(b=>b.setAttribute('aria-pressed','false'));updateCTA()} // 검색으로 가려진 선택은 풀기
-  if(q&&shown.length===1&&S.r!==shown[0].dataset.r){S.r=shown[0].dataset.r;pick($('regions'),shown[0],false)} // 하나만 남으면 바로 선택(타이핑 중이라 스크롤은 안 함)
+  if(S.r)S.d=QD[S.r]??null; // 검색어가 바뀌면 미리 고른 동도 같이 바뀜
+  if(q&&shown.length===1&&S.r!==shown[0].dataset.r){S.r=shown[0].dataset.r;S.d=QD[S.r]??null;pick($('regions'),shown[0],false)} // 하나만 남으면 바로 선택(타이핑 중이라 스크롤은 안 함)
 };
 
 function showResult(){$('input').hidden=true;$('result').hidden=false;document.querySelector('footer').hidden=false; // 안내문은 결과 화면에서만 (입력 단계는 한 화면에)
 $('menu').hidden=false;document.body.classList.add('has-menu'); // 하단 바로 가기 메뉴는 결과 화면에서만
 $('back').hidden=S.shared;$('back').textContent='다시';$('friend').hidden=!S.shared;$('shareBox').hidden=S.shared;
   $('go').classList.remove('wait');$('go').textContent=S.shared?'내 동네도 해보기':'친구에게 결과 보내기';scrollTo(0,0)}
-function showInput(){if(S.shared){Object.assign(S,{r:null,c:null,h:null,f:null});document.querySelectorAll('#input .opt').forEach(b=>b.setAttribute('aria-pressed','false'))}
+function showInput(){if(S.shared){Object.assign(S,{r:null,d:null,c:null,h:null,f:null});document.querySelectorAll('#input .opt').forEach(b=>b.setAttribute('aria-pressed','false'))}
   S.shared=false;$('result').hidden=true;$('input').hidden=false;$('friend').hidden=true;
   try{history.replaceState(null,'',location.pathname+location.search)}catch{}showStep(1)}
 function start(){
   if($('scan').classList.contains('on'))return; // 빠르게 두 번 눌러도 한 번만
   $('scanT').textContent=`${S.r} 스캔 중…`;$('scan').classList.add('on');
   render(); // 카드도 스캔 연출 동안 미리 만들어 둔다
-  track('simulate_complete',{region:S.r,crisis:S.c,home:S.h,floor:S.f,grade:gradeOf(scoreOf(S.r,S.c,S.h))});
+  track('simulate_complete',{region:S.r,crisis:S.c,home:S.h,floor:S.f,grade:gradeOf(myScore())});
   setTimeout(()=>{$('scan').classList.remove('on');showResult()},1200);
 }
 $('go').onclick=()=>{
@@ -978,14 +1024,14 @@ function analysis(){
 }
 
 function render(){
-  const sc=scoreOf(S.r,S.c,S.h),g=gradeOf(sc),v=R[S.r],rk=rankOf(S.r,S.c,S.h,S.f);
+  const sc=myScore(),g=gradeOf(sc),v=R[S.r],rk=rankOf(S.r,S.c,S.h,S.f);
   try{history.replaceState(null,'',hashOf())}catch{}
   const bars=barKeys().map(k=>`<div class="bar"><span>${AX[k]}</span><i><u style="width:${val(v,k)}%"></u></i><span>${val(v,k)}</span></div>`).join('');
   const lines=analysis().filter(Boolean); // 맨 위는 스토리 카드 이미지가 대신함 (등급·점수·순위·표정이 다 들어 있음)
   $('detail').innerHTML=bars+`<div class="lines">${lines.map(t=>`<p>${t}</p>`).join('')}</div>`;
 
   const [bad,good]=whyOf(),li=a=>a.map(t=>`<li>${t}</li>`).join('');
-  $('whyH').textContent=`왜 ${eun(S.r)} ${g}등급?`;
+  $('whyH').textContent=`왜 ${eun(place())} ${g}등급?`;renderDongBox();
   const WHEN={war:'공습이 오면',apt:'폭격을 맞으면',out:'정전이 되면',quake:'지진이 나면',gas:'독가스가 퍼지면',nuke:'원전 사고가 나면',tsu:'해일이 오면',fire:'산불이 번지면',pand:'감염병이 돌면',cyber:'통신·결제가 멈추면'};
   $('followH').textContent=`${WHEN[S.c]}, ${eun(S.r)}? 영상으로 먼저 봐요`;
   $('why').innerHTML=`<p class="ins">${esc(insightOf(S.r,S.c))}</p><div><h4>불리한 점</h4><ul>${li(bad)}</ul></div><div><h4>버티는 점</h4><ul>${li(good)}</ul></div>
@@ -1054,7 +1100,7 @@ async function drawCard(sc,g){
   if($('cardImg').src)$('cardImg').classList.add('busy'); // 새 카드 나올 때까지 이전 카드 흐리게
   cardBlob=null;const seq=++cardSeq,W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
   const F=getComputedStyle(document.body).fontFamily,D=`'Black Han Sans',${F}`,v=R[S.r],brand='#ff4b1f',sub='#c9c1ba',fg='#f6f2ee';
-  try{await document.fonts.load(`80px 'Black Han Sans'`,S.r+g+'우리 동네는 몇 등급?왜등급')}catch{} // 한글은 글자별 묶음으로 나뉘어 받아짐 → 쓸 글자를 넘겨야 다 받는다
+  try{await document.fonts.load(`80px 'Black Han Sans'`,place()+g+'우리 동네는 몇 등급?왜등급')}catch{} // 한글은 글자별 묶음으로 나뉘어 받아짐 → 쓸 글자를 넘겨야 다 받는다
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(charSVG(g));
   try{await img.decode()}catch{}
   if(seq!==cardSeq)return; // 그 사이 다른 결과로 바뀌었으면 버린다
@@ -1065,15 +1111,15 @@ async function drawCard(sc,g){
   const L=96,RX=935;
   x.font=`700 34px ${F}`;x.fillStyle=brand;x.fillText('내 동네 위기 시뮬레이터',L,300);
   x.font=`600 30px ${F}`;x.fillStyle=sub;x.textAlign='right';x.fillText('재미로 보는 시뮬레이션 · 맹신 금물',RX,300);x.textAlign='left';
-  x.fillStyle=fg;x.font=`400 104px ${D}`;x.fillText(S.r,L,406);
+  x.fillStyle=fg;{let fz=104;x.font=`400 ${fz}px ${D}`;while(x.measureText(place()).width>520&&fz>60){fz-=4;x.font=`400 ${fz}px ${D}`}x.fillText(place(),L,406)}
   x.font=`600 40px ${F}`;x.fillStyle=sub;x.fillText(`${CRISIS[S.c].name} · ${HOME[S.h].name} · ${FLOOR[S.f]}`,L,466);
   x.drawImage(img,630,490,290,290);
   x.fillStyle=fg;x.font=`400 320px ${D}`;x.fillText(g,84,770);
   // 점수 + 순위 한 줄
   x.font=`600 42px ${F}`;x.fillStyle=sub;x.fillText('안전점수',L,842);const sw=x.measureText('안전점수  ').width;
   x.fillStyle=fg;x.font=`800 50px ${F}`;x.fillText(`${sc}`,L+sw,842);const nw=x.measureText(`${sc}`).width;x.font=`600 36px ${F}`;x.fillStyle=sub;x.fillText(' / 100',L+sw+nw,842);
-  x.textAlign='right';x.font=`800 38px ${F}`;x.fillStyle='#ff8a2c';const rk=`${rankOf(S.r,S.c,S.h,S.f)}위`;x.fillText(rk,RX,842);const rw=x.measureText(rk).width;
-  x.font=`600 36px ${F}`;x.fillStyle=sub;x.fillText(`같은 조건 ${NR}곳 중 `,RX-rw,842);x.textAlign='left';
+  x.textAlign='right';x.font=`800 38px ${F}`;x.fillStyle='#ff8a2c';const [rkN,rkT]=dRow()?dongRank():[rankOf(S.r,S.c,S.h,S.f),NR],rk=`${rkN}위`;x.fillText(rk,RX,842);const rw=x.measureText(rk).width;
+  x.font=`600 36px ${F}`;x.fillStyle=sub;x.fillText(dRow()?`${S.r} ${rkT}개 동 중 `:`같은 조건 ${NR}곳 중 `,RX-rw,842);x.textAlign='left';
   // 점수 막대: D(~35)·C·B·A·S(80~) 구간 + 내 위치
   const gy=870,gh=16,gw=RX-L,px=v=>L+gw*Math.max(0,Math.min(100,v))/100;
   x.fillStyle='#2e2926';x.beginPath();x.roundRect(L,gy,gw,gh,8);x.fill();
@@ -1116,7 +1162,7 @@ $('introChar').innerHTML=charSVG('C');$('scanChar').innerHTML=charSVG('C');
 const INAPP=/Instagram|FBAN|FBAV|KAKAOTALK|NAVER|Line\//i.test(navigator.userAgent);
 async function share(){
   if(!cardBlob){toast('카드를 만드는 중이에요. 잠깐만요');return}
-  const name=`ifkr_${S.r}_${S.c}_${gradeOf(scoreOf(S.r,S.c,S.h))}.png`,file=new File([cardBlob],name,{type:'image/png'});
+  const name=`ifkr_${S.r}_${S.c}_${gradeOf(myScore())}.png`,file=new File([cardBlob],name,{type:'image/png'});
   track('share_click',{region:S.r,crisis:S.c});
   try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return}}catch(e){if(e.name==='AbortError')return}
   scrollTo({top:0,behavior:'smooth'});
@@ -1124,8 +1170,8 @@ async function share(){
   const a=document.createElement('a');a.href=$('cardImg').src;a.download=name;a.click();toast('저장이 안 되면 이미지를 길게 누르세요');
 }
 $('copyCap').onclick=async()=>{
-  const sc=scoreOf(S.r,S.c,S.h);
-  const t=`만약 ${IFW[S.c]}, 우리 동네 ${S.r}은 ${gradeOf(sc)}등급, 전국 ${NR}곳 중 ${rankOf(S.r,S.c,S.h,S.f)}위 (재미로 보는 시뮬레이션)\n내 동네도 10초면 나와요 · @ifkr.now 프로필 링크\n#ifkrnow #내동네위기시뮬레이터 #${CRISIS[S.c].tag} #재난준비 #생존체크리스트`.replace(`${S.r}은`,eun(S.r));
+  const sc=myScore();
+  const t=`만약 ${IFW[S.c]}, 우리 동네 ${S.r}은 ${gradeOf(sc)}등급, ${dRow()?`${S.r} ${dongRank()[1]}개 동 중 ${dongRank()[0]}위`:`전국 ${NR}곳 중 ${rankOf(S.r,S.c,S.h,S.f)}위`} (재미로 보는 시뮬레이션)\n내 동네도 10초면 나와요 · @ifkr.now 프로필 링크\n#ifkrnow #내동네위기시뮬레이터 #${CRISIS[S.c].tag} #재난준비 #생존체크리스트`.replace(`${S.r}은`,eun(place()));
   track('caption_copy');
   try{await navigator.clipboard.writeText(t);toast('캡션을 복사했어요')}catch{showCopy(t,'캡션')}
 };
@@ -1133,8 +1179,8 @@ function showCopy(t,what){const b=$('copyBox');b.querySelector('b').textContent=
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1600)}
 $('saveCard').onclick=share;
 async function sendResult(){
-  const u=location.origin+location.pathname+'?utm_source=share&utm_medium=send'+hashOf(),g=gradeOf(scoreOf(S.r,S.c,S.h));
-  const t=`만약 ${IFW[S.c]}, ${eun(S.r)} ${g}등급이래. 네 동네도 10초면 나와`;
+  const u=location.origin+location.pathname+'?utm_source=share&utm_medium=send'+hashOf(),g=gradeOf(myScore());
+  const t=`만약 ${IFW[S.c]}, ${eun(place())} ${g}등급이래. 네 동네도 10초면 나와`;
   track('link_send');
   try{if(navigator.share){await navigator.share({title:'내 동네 위기 시뮬레이터',text:t,url:u});return}}catch(e){if(e.name==='AbortError')return}
   try{await navigator.clipboard.writeText(t+' '+u);toast('링크를 복사했어요. 카톡에 붙여 넣으세요')}catch{showCopy(t+' '+u,'링크')}
@@ -1198,11 +1244,27 @@ function openKit(){
 const closeKit=()=>{$('kit').hidden=true;document.body.style.overflow=''};
 $('kitClose').onclick=closeKit;$('kit').onclick=e=>{if(e.target===$('kit'))closeKit()};
 document.querySelectorAll('[data-sns]').forEach(a=>a.addEventListener('click',()=>track('follow_click',{sns:a.dataset.sns,where:a.closest('footer')?'footer':'result'})));
+// 동 고르기 (결과 화면): 동 이름·구 이름으로 거르고 누르면 그 동 기준으로 다시 계산
+function renderDongBox(){const box=$('dongBox');
+  if(S.shared||!DG||!DG.d[S.r]){box.hidden=true;if(!DG&&!S.shared)loadDG().then(d=>{if(d&&!$('result').hidden)renderDongBox()});return}
+  box.hidden=false;const x=dRow();
+  $('dongH').textContent=x?`${place()} 기준 결과예요`:`${S.r} 어느 동이에요? 동마다 등급이 달라요`;
+  $('dongSub').textContent=x?'다른 동으로 바꾸거나 시 전체로 볼 수 있어요':`${DG.t[S.r].n}개 동마다 대피소·병원 거리·아파트 비율이 달라요`;
+  drawDongOpts()}
+function drawDongOpts(){const q=$('dongQ').value.trim().replace(/\s+/g,''),rows=DG.d[S.r];
+  const hit=q?rows.map((x,i)=>[x,i]).filter(([x])=>x[1]>0&&(x[0].includes(q)||x[7].includes(q))):[];
+  const btn=(t,i)=>`<button type="button" data-i="${i}" aria-pressed="${S.d===i}">${esc(t)}</button>`;
+  $('dongOpts').innerHTML=(S.d!=null?`<button type="button" data-i="-1">${esc(S.r)} 전체로 보기</button>`:'')+(q?(hit.slice(0,12).map(([x,i])=>btn(x[0],i)).join('')||'<span class="note">그 이름의 동이 없어요</span>'):'');
+  $('dongOpts').querySelectorAll('button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;S.d=i<0?null:i;$('dongQ').value='';
+    track('dong_pick',{region:S.r,on:S.d!=null});render();$('cardImg').scrollIntoView({behavior:'smooth',block:'start'})})}
+$('dongQ').oninput=drawDongOpts;
+loadDG();
 track('page_view',{src:new URLSearchParams(location.search).get('utm_source')||'direct'});
 // 친구가 보낸 결과 링크로 들어온 경우
-(()=>{const m=location.hash.match(/^#r-(\d+)-(\w+)-(\w+)-(\d)$/),r=m&&Object.keys(R)[+m[1]];
+(async()=>{const m=location.hash.match(/^#r-(\d+)-(\w+)-(\w+)-(\d)(?:-d(\d+))?$/),r=m&&Object.keys(R)[+m[1]];
   if(!r||!CRISIS[m[2]]||!HOME[m[3]]||!FLOOR[+m[4]])return;
-  Object.assign(S,{r,c:m[2],h:m[3],f:+m[4],shared:true,friend:r});render();showResult();track('friend_view',{region:r})})();
+  if(m[5]!=null)await loadDG(); // 동까지 고른 결과 링크면 동 자료를 먼저 받음
+  Object.assign(S,{r,d:m[5]!=null?+m[5]:null,c:m[2],h:m[3],f:+m[4],shared:true,friend:r});render();showResult();track('friend_view',{region:r})})();
 </script>
 </body>
 </html>
