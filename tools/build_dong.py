@@ -4,6 +4,7 @@
 #   ../shelters.json(행정안전부 민방위대피시설)
 # 실행: python -I tools/build_dong.py  (프로젝트 폴더에서)
 import json, csv, math, re, sys
+from collections import Counter
 sys.stdout.reconfigure(encoding='utf-8')
 RAW = 'data_raw/'
 REGIONS = re.findall(r'([가-힣]+):\[', open('index.html', encoding='utf-8').read().split('const R = {')[1].split('};')[0])
@@ -179,6 +180,24 @@ except FileNotFoundError: pass
 print('stations', len(ST), 'ic', len(IC))
 names = sorted({h[2] for h in H} | {s[2] for s in ST} | {i[2] for i in IC}); ni = {n: i for i, n in enumerate(names)}
 
+# 아파트 단지 수: 국토교통부 공동주택 단지 목록(K-apt 등록 단지, tools/fetch_apt.py) — 법정동 이름으로 행정동에 연결
+# 관저동(법정동) → 관저1동·관저2동(행정동)처럼 나눠 쓰면 「관저동 일대」로 같은 수를 보여 줌
+APT = Counter()
+try:
+    for a in json.load(open(RAW + 'apt.json', encoding='utf-8')):
+        if a['as1'] and a['as3']: APT[(a['as1'], (a['as2'] or '세종시').replace(' ', ''), a['as3'])] += 1  # 세종은 시군구 칸이 비어 있음
+except FileNotFoundError: pass
+core = lambda n: re.sub(r'(제)?[\d·]*(가)?[\d·]*(동|읍|면|가)$', '', n)
+sggN = lambda s: re.sub(r'^(\S+?)시(\S+구)$', r'\1\2', s)
+BJ = {}  # (시도, 시군구) → [(법정동, 단지 수)]
+for (s1, s2, s3), n in APT.items(): BJ.setdefault((s1, s2), []).append((s3, n))
+claim = Counter(); AM = {}
+for d in D:
+    c = core(d['nm']); hits = [(b, n) for b, n in BJ.get((d['sido'], sggN(d['sgg'])), []) if len(core(b)) >= 2 and (core(b) == c or (len(c) > len(core(b)) and core(b) in c))]
+    AM[d['code']] = hits
+    for b, n in hits: claim[(d['sido'], d['sgg'], b)] += 1
+print('apt matched dongs', sum(1 for h in AM.values() if h), '/', len(D))
+
 out = {}; nsg = 0
 def near(d, L):
     return min((km(d['cy'], d['cx'], p[0], p[1]), p) for p in L) if L else (-1, None)
@@ -189,9 +208,11 @@ for d in D:
     sk, s = near(d, ST); ik, ic = near(d, IC); e65, kid = AGE.get(d['code'], (-1, -1))
     out.setdefault(d['r'], []).append([d['nm'], d['pop'], round(d['area'], 2), d['sn'], d['sc'], round(k, 1), ni[h[2]], d['sgg'], apt, old,
         e65, kid, SOLO.get(d['code'], -1), d['ele'], d['rel'], d['low'], d['sea'],
-        ni[s[2]] if s else -1, round(sk, 1), (1 if s and s[3] else 0), ni[ic[2]] if ic else -1, round(ik, 1)])
+        ni[s[2]] if s else -1, round(sk, 1), (1 if s and s[3] else 0), ni[ic[2]] if ic else -1, round(ik, 1),
+        sum(n for _, n in AM[d['code']]) if AM[d['code']] else (0 if (d['sido'], sggN(d['sgg'])) in BJ else -1),  # 그 시군구 목록에 없으면 0곳
+        '·'.join(b for b, _ in AM[d['code']] if claim[(d['sido'], d['sgg'], b)] > 1)])
 print('sgis matched', nsg, '/', len(D))
-# 행: [0동 1인구 2면적 3대피소수 4수용 5병원km 6병원 7구 8공동주택% 9노후% 10고령% 11어린이% 12 1인세대% 13평균고도m 14고저차m 15저지대% 16바다km 17역 18역km 19지하철? 20나들목 21나들목km]
+# 행: [0동 1인구 2면적 3대피소수 4수용 5병원km 6병원 7구 8공동주택% 9노후% 10고령% 11어린이% 12 1인세대% 13평균고도m 14고저차m 15저지대% 16바다km 17역 18역km 19지하철? 20나들목 21나들목km 22아파트단지수(K-apt, 없으면 -1) 23나눠 쓰는 법정동 이름(있으면 「○○동 일대」)]
 json.dump({'h': names, 'd': out}, open('dong.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 miss = [r for r in REGIONS if r not in out]
 print('regions', len(out), 'missing', miss, 'dongs', sum(map(len, out.values())), 'hosp', len(H))

@@ -282,7 +282,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
   <p><b>재미로 보는 시뮬레이션입니다. 결과를 맹신하지 마세요.</b> 이 사이트의 등급·점수·순위는 <b>실제 안전 등급이 아닙니다.</b> 공개 자료와 ifkr.now가 정한 계수를 같은 공식으로 계산한 <b>시뮬레이션 결과</b>이며, 실제 재난 피해나 정부·전문기관의 판단과 다를 수 있습니다. 특정 지역을 깎아내리거나 불안을 키우려는 목적이 없습니다.</p>
   <h4>점수는 이렇게 계산해요</h4>
   <p>지역마다 9가지 지표(0~100)에 위기별 가중치를 곱해 더하고, 가구·층 조건 점수를 더하고 뺍니다. 이 중 4가지는 <b>공개 자료로 계산</b>합니다. ① 타격 거리 = 시청에서 군사분계선까지 직선거리 60% + 주요 군사·국가 시설 수 40% ② 원전 거리 = 가장 가까운 원전까지 직선거리 ③ 대피 인프라 = 주민 1명당 민방위 대피소 수용 인원(행정안전부) ④ 인구 밀집 = 인구 밀도(2024년 말 인구·면적 근삿값). 회복력·지형·보급 속도·해안·산불 5가지는 지역 특성을 보고 ifkr.now가 정한 값입니다. 등급은 S 80점 이상, A 65, B 50, C 35, D 그 아래입니다.</p>
-  <p>동까지 고르면 그 동의 자료로 ±10점 안에서 더하고 뺍니다. 주민 1명당 민방위 대피소 수용 인원(행정안전부 민방위대피시설), 인구·65세 이상·12세 이하·1인 세대 비율(행정안전부 행정동 주민등록 인구·세대 2026년 10월), 가장 가까운 종합병원까지 직선거리(건강보험심사평가원 병의원 현황 2026년 9월), 도시 평균과 비교한 인구 밀도, 공동주택·노후주택 비율(통계청 SGIS 살고싶은 우리동네 2022, 10% 구간), 평균 해발·고저차·해발 10m 아래 비율(AWS Terrain Tiles, 미국 지질조사국 SRTM 등 원자료, 약 120m 격자), 바다까지 거리(행정동 경계로 계산), 가장 가까운 철도·지하철역과 고속도로 나들목(© OpenStreetMap contributors, ODbL)입니다. 동 경계는 통계청 SGIS 행정동 경계(vuski/admdongkor 가공, CC BY 4.0)를 썼습니다.</p>
+  <p>동까지 고르면 그 동의 자료로 ±10점 안에서 더하고 뺍니다. 주민 1명당 민방위 대피소 수용 인원(행정안전부 민방위대피시설), 인구·65세 이상·12세 이하·1인 세대 비율(행정안전부 행정동 주민등록 인구·세대 2026년 10월), 가장 가까운 종합병원까지 직선거리(건강보험심사평가원 병의원 현황 2026년 9월), 도시 평균과 비교한 인구 밀도, 공동주택·노후주택 비율(통계청 SGIS 살고싶은 우리동네 2022, 10% 구간), 아파트 단지 수(국토교통부 공동주택 단지 목록, K-apt 관리 대상 단지를 법정동 이름으로 연결), 평균 해발·고저차·해발 10m 아래 비율(AWS Terrain Tiles, 미국 지질조사국 SRTM 등 원자료, 약 120m 격자), 바다까지 거리(행정동 경계로 계산), 가장 가까운 철도·지하철역과 고속도로 나들목(© OpenStreetMap contributors, ODbL)입니다. 동 경계는 통계청 SGIS 행정동 경계(vuski/admdongkor 가공, CC BY 4.0)를 썼습니다.</p>
   <p>실제 재난 상황에서는 재난문자와 정부·지자체 공식 안내(안전디딤돌 앱, 국민재난안전포털)를 항상 먼저 따르세요.</p>
   <p>이름·연락처 같은 개인정보는 받지 않습니다. 등급 계산은 이 기기 안에서 끝나고, 아무것도 저장하지 않습니다. 사이트 개선을 위해 어떤 지역·위기를 골랐는지, 어떤 버튼을 눌렀는지는 구글 애널리틱스로 익명 통계만 모읍니다.</p>
   <h4>쿠팡 파트너스 안내</h4>
@@ -763,7 +763,7 @@ const loadDG=()=>DGP||(DGP=fetch('dong.json').then(r=>r.ok?r.json():null).then(j
   return DG=j}).catch(()=>null));
 const dRow=(r=S.r,i=S.d)=>DG&&i!=null&&DG.d[r]?DG.d[r][i]||null:null;
 const clip=(x,a)=>Math.max(-a,Math.min(a,x));
-// 행: [0동 1인구 2면적 3대피소수 4수용 5병원km 6병원 7구 8공동주택% 9노후% 10고령% 11어린이% 12 1인세대% 13평균고도m 14고저차m 15저지대% 16바다km 17역 18역km 19지하철 20나들목 21나들목km]
+// 행: [0동 1인구 2면적 3대피소수 4수용 5병원km 6병원 7구 8공동주택% 9노후% 10고령% 11어린이% 12 1인세대% 13평균고도m 14고저차m 15저지대% 16바다km 17역 18역km 19지하철 20나들목 21나들목km 22아파트단지 23나눠쓰는 법정동]
 const dongEval=(r,c,i)=>{const x=dRow(r,i),B=[],G=[];if(!x||!x[1])return {adj:0,bad:[],good:[]};
   const [nm,pop,area,sn,sc,km,hi,,apt,old,e65,kid,solo,ele,rel,low,sea,si,skm,sub,ii,ikm]=x,T=DG.t[r],N=DG.h;let adj=0;
   const add=(v,t)=>{if(!v)return;adj+=v;(v<0?B:G).push([Math.abs(v),t])};
@@ -797,8 +797,8 @@ const dongEval=(r,c,i)=>{const x=dRow(r,i),B=[],G=[];if(!x||!x[1])return {adj:0,
   return {adj:clip(adj,10),bad:ord(B),good:ord(G)}};
 // 결과 화면 「우리 동네 생존 프로필」: 고른 동의 실제 숫자
 function renderProfile(){const box=$('profile'),x=dRow();if(!x||!x[1]){box.hidden=true;return}
-  const [nm,pop,area,sn,sc,km,hi,g,apt,old,e65,kid,solo,ele,rel,low,sea,si,skm,sub,ii,ikm]=x,N=DG.h,man=n=>n>=10000?`${(n/10000).toFixed(1)}만`:n.toLocaleString();
-  const rows=[['인구',`${man(pop)}명 · 65세 이상 ${e65}% · 12세 이하 ${kid}%`],['1인 세대',solo>=0?`${solo}%`:'자료 없음'],
+  const [nm,pop,area,sn,sc,km,hi,g,apt,old,e65,kid,solo,ele,rel,low,sea,si,skm,sub,ii,ikm,ac,ash]=x,N=DG.h,man=n=>n>=10000?`${(n/10000).toFixed(1)}만`:n.toLocaleString();
+  const rows=[['인구',`${man(pop)}명 · 65세 이상 ${e65}% · 12세 이하 ${kid}%`],...(ac>0?[['아파트 단지',`${ash?ash+' 일대 ':''}${ac}곳 (국토부 관리 대상)`]]:[]),['1인 세대',solo>=0?`${solo}%`:'자료 없음'],
     ['지형',`평균 해발 ${ele}m · 고저차 ${rel}m${low>=20?` · 해발 10m 아래 ${low}%`:''}`],['바다까지',sea<0?'25km 넘음':`${sea}km`],
     ['가까운 역',si>=0?`${N[si]} ${skm}km${sub?' (지하철)':''}`:'자료 없음'],['종합병원',`${N[hi]} ${km}km`],
     ['민방위 대피소',sn?`${sn}곳 · 주민 1명당 ${(sc/pop).toFixed(1)}명분`:'동 안에 없음'],['고속도로',ii>=0?`${N[ii]} ${ikm}km`:'자료 없음'],
@@ -1187,7 +1187,7 @@ async function drawCard(sc,g){
   // 주요 시설은 통째로 들어가는 것만 이어 붙임 (중간에 잘리지 않게)
   x.font=`600 35px ${F}`;let fac='';for(const k of FAC[S.r].k){const t=fac?fac+' · '+k:k;if(x.measureText(t).width>RX-L-KW)break;fac=t}
   const fl=CRISIS[S.c].fl[S.f],ft=CRISIS[S.c].ft.split('.')[0];
-  [dRow()?[dRow()[0],`인구 ${(dRow()[1]/10000).toFixed(1)}만 · 65세↑ ${dRow()[10]}% · 해발 ${dRow()[13]}m`,sub]:['주요 시설',fac,sub],[`${FLOOR[S.f]} ${pts(fl)}`,ft,fl<0?'#ff8a2c':fg],[`${HOME[S.h].name} ${pts(HOME[S.h].adj)}`,HOME[S.h].why,HOME[S.h].adj<0?'#ff8a2c':fg]].forEach(([k,t,col])=>{
+  [dRow()?[dRow()[0],`인구 ${(dRow()[1]/10000).toFixed(1)}만 · ${dRow()[22]>0?`아파트 ${dRow()[22]}단지`:`해발 ${dRow()[13]}m`} · 고령 ${dRow()[10]}%`,sub]:['주요 시설',fac,sub],[`${FLOOR[S.f]} ${pts(fl)}`,ft,fl<0?'#ff8a2c':fg],[`${HOME[S.h].name} ${pts(HOME[S.h].adj)}`,HOME[S.h].why,HOME[S.h].adj<0?'#ff8a2c':fg]].forEach(([k,t,col])=>{
     x.font=`800 35px ${F}`;x.fillStyle=col;x.fillText(k,L,y);const kw=Math.max(KW,x.measureText(k+'  ').width);
     x.font=`600 35px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y);y+=50});
   x.fillStyle='#2e2926';x.fillRect(L,y-14,RX-L,2);
