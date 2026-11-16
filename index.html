@@ -1056,7 +1056,7 @@ async function share(){
 }
 $('copyCap').onclick=async()=>{
   const sc=scoreOf(S.r,S.c,S.h);
-  const t=`${CRISIS[S.c].name} 오면 우리 동네 ${S.r}은 ${gradeOf(sc)}등급, 전국 ${NR}곳 중 ${rankOf(S.r,S.c,S.h,S.f)}위\n내 동네도 10초면 나와요 · @ifkr.now 프로필 링크\n#ifkrnow #내동네위기시뮬레이터 #${CRISIS[S.c].tag} #재난준비 #생존체크리스트`.replace(`${S.r}은`,eun(S.r));
+  const t=`만약 ${IFW[S.c]}, 우리 동네 ${S.r}은 ${gradeOf(sc)}등급, 전국 ${NR}곳 중 ${rankOf(S.r,S.c,S.h,S.f)}위 (재미로 보는 시뮬레이션)\n내 동네도 10초면 나와요 · @ifkr.now 프로필 링크\n#ifkrnow #내동네위기시뮬레이터 #${CRISIS[S.c].tag} #재난준비 #생존체크리스트`.replace(`${S.r}은`,eun(S.r));
   track('caption_copy');
   try{await navigator.clipboard.writeText(t);toast('캡션을 복사했어요')}catch{showCopy(t,'캡션')}
 };
@@ -1065,7 +1065,7 @@ function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTi
 $('saveCard').onclick=share;
 async function sendResult(){
   const u=location.origin+location.pathname+'?utm_source=share&utm_medium=send'+hashOf(),g=gradeOf(scoreOf(S.r,S.c,S.h));
-  const t=`${CRISIS[S.c].name} 오면 ${S.r} ${g}등급 나왔어. 네 동네도 10초면 나와`;
+  const t=`만약 ${IFW[S.c]}, ${eun(S.r)} ${g}등급이래. 네 동네도 10초면 나와`;
   track('link_send');
   try{if(navigator.share){await navigator.share({title:'내 동네 위기 시뮬레이터',text:t,url:u});return}}catch(e){if(e.name==='AbortError')return}
   try{await navigator.clipboard.writeText(t+' '+u);toast('링크를 복사했어요. 카톡에 붙여 넣으세요')}catch{showCopy(t+' '+u,'링크')}
