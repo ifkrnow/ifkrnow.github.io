@@ -190,6 +190,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 .profile{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
 .profile h3{font-size:16px;margin:0 0 10px}.profile dl{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin:0;font-size:14px}
 .profile dt{color:var(--sub)}.profile dd{margin:0;min-width:0}.profile .note{margin-top:10px}
+.profsh{margin-top:16px;display:grid;gap:8px}.profsh h4{margin:0;font-size:15px}#profShList{display:grid;gap:8px}
 </style>
 </head>
 <body>
@@ -233,7 +234,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 <main id="result" hidden>
   <div class="friend" id="friend" hidden><b>친구가 보낸 결과예요</b>내 동네는 몇 등급일까? 아래 버튼으로 15초 진단</div>
   <div class="story"><img id="cardImg" alt="결과 스토리 카드"></div>
-  <section class="profile" id="profile" hidden><h3 id="profH"></h3><dl id="profDl"></dl><p class="note">거리는 동 한가운데에서 잰 직선거리예요. 자세한 출처는 맨 아래에 있어요.</p></section>
+  <section class="profile" id="profile" hidden><h3 id="profH"></h3><dl id="profDl"></dl><div id="profSh" class="profsh" hidden><h4>가장 가까운 대피소</h4><div id="profShList"></div></div><p class="note">거리는 동 한가운데에서 잰 직선거리예요. 자세한 출처는 맨 아래에 있어요.</p></section>
   <div class="sharebox" id="shareBox">
     <button id="saveCard" class="send">카드 저장 · 인스타 스토리 올리기</button>
     <a class="igbtn" href="https://www.instagram.com/ifkr.now/" target="_blank" rel="noopener" data-sns="instagram">인스타 @ifkr.now 팔로우 · 다른 위기 영상 보기</a>
@@ -811,7 +812,16 @@ function renderProfile(){const box=$('profile'),x=dRow();if(!x||!x[1]){box.hidde
     ['민방위 대피소',sn?`${sn}곳 · 주민 1명당 ${(sc/pop).toFixed(1)}명분`:'동 안에 없음'],['고속도로',ii>=0?`${N[ii]} ${ikm}km`:'자료 없음'],
     ['공동주택',apt>=0?`${apt>=95?'90% 이상':apt<=5?'10% 미만':`${apt-5}~${apt+5}%`}${old>=0?` · 오래된 주택 ${old>=95?'90% 이상':old<=5?'10% 미만':`${old-5}~${old+5}%`}`:''}`:'자료 없음']];
   $('profH').textContent=`위기 때 ${eun(place())}?`;
-  $('profDl').innerHTML=rows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');box.hidden=false}
+  $('profDl').innerHTML=rows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');box.hidden=false;
+  // 그 동 한가운데에서 가까운 민방위 대피소 3곳 (shelters.json은 이때 처음 받음) + 카카오맵 지도·길찾기
+  const lat=x[24],lon=x[25],key=S.r+'/'+S.d;$('profSh').hidden=true;if(lat==null)return;
+  loadSH().then(all=>{if(key!==S.r+'/'+S.d)return; // 그 사이 다른 동으로 바뀌었으면 버림
+    const c=Math.cos(lat*Math.PI/180),dk=r=>Math.hypot((r[0]-lat)*111,(r[1]-lon)*111*c);
+    const seen=new Set(),near=[];for(const z of all.map(r=>[dk(r),r]).sort((a,b)=>a[0]-b[0])){ // 같은 주소(같은 단지)는 한 곳만
+      const k=z[1][3].replace(/\s*\(.*$/,'');if(seen.has(k))continue;seen.add(k);near.push(z);if(near.length===3)break}
+    $('profShList').innerHTML=near.map(([d,[la,lo,n,a,cap,u]])=>`<div class="shrow"><div><b>${esc(n)}</b><span>${esc(a)}</span><span>${d<1?Math.round(d*1000)+'m':d.toFixed(1)+'km'} · ${u?'지하':'지상'} · 최대 ${cap.toLocaleString()}명</span></div>
+      <div class="act"><a href="https://map.kakao.com/link/map/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">지도</a><a href="https://map.kakao.com/link/to/${encodeURIComponent(n)},${la},${lo}" target="_blank" rel="noopener">길찾기</a></div></div>`).join('');
+    $('profSh').hidden=false;track('dong_shelter_view',{region:S.r})}).catch(()=>{})}
 const myScore=(i=S.d)=>Math.max(0,Math.min(100,scoreOf(S.r,S.c,S.h)+dongEval(S.r,S.c,i).adj));
 const dongRank=()=>{const me=myScore();return [1+DG.d[S.r].filter((x,i)=>x[1]>0&&myScore(i)>me).length,DG.t[S.r].n]};
 const place=()=>dRow()?`${S.r} ${dRow()[0]}`:S.r;
