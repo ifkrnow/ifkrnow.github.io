@@ -1148,6 +1148,8 @@ async function drawCard(sc,g){
   try{await img.decode()}catch{}
   if(seq!==cardSeq)return; // 그 사이 다른 결과로 바뀌었으면 버린다
   x.fillStyle='#0f0d0c';x.fillRect(0,0,W,H);x.textBaseline='alphabetic';
+  // 위아래 여백까지 쓰게 내용 전체를 1.1배로 (원래 좌표 260~1738 → 175~1801, 좌우 여백 약 60px)
+  const SC=1.1;x.setTransform(SC,0,0,SC,540-515.5*SC,175-260*SC);
   // 위 270px는 인스타 UI 가림 영역 → 비워 둔다
   // 너무 긴 글은 폭에 맞춰 … 처리 (오른쪽 935px 넘지 않게)
   const fit=(t,maxW)=>{if(x.measureText(t).width<=maxW)return t;while(t.length>1&&x.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t+'…'};
@@ -1209,6 +1211,7 @@ async function drawCard(sc,g){
   const tw=parts.reduce((a,[t,f])=>{x.font=f;return a+x.measureText(t).width},0);let tx=L+(RX-L-tw)/2;
   parts.forEach(([t,f,c])=>{x.font=f;x.fillStyle=c;x.fillText(t,tx,bx+48);tx+=x.measureText(t).width});
   cardBottom=bx+bh;
+  x.setTransform(1,0,0,1,0,0);x.textAlign='center';x.font=`600 30px ${F}`;x.fillStyle='#8f8781';x.fillText('ifkrnow.github.io · 우리 동네도 10초면 나와요',540,1872);x.textAlign='left';
   cv.toBlob(b=>{if(seq!==cardSeq)return;cardBlob=b;$('cardImg').src=URL.createObjectURL(b);$('cardImg').classList.remove('busy')},'image/png');
 }
 $('introChar').innerHTML=charSVG('C');$('scanChar').innerHTML=charSVG('C');
