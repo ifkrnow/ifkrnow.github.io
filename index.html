@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>내 동네 위기 시뮬레이터 · ifkr.now</title>
-<meta name="description" content="사는 곳·위기·가구·층수 4가지만 고르면 10초 안에 동네 위기 등급(S~D)과 대피소·생존 물품까지">
+<meta name="description" content="사는 곳·위기·가구·층수 4가지만 고르면 15초 안에 동네 위기 등급(S~D)과 대피소·생존 물품까지">
 <meta property="og:title" content="만약 전쟁 나면, 우리 동네는 안전한 등급일까?">
-<meta property="og:description" content="전쟁·폭격·정전·지진·독가스, 우리 집은 버틸 수 있을까? 전국 55곳 10초 진단">
+<meta property="og:description" content="전쟁·폭격·정전·지진·독가스, 우리 집은 버틸 수 있을까? 전국 55곳 15초 진단">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ifkrnow.github.io/">
 <meta property="og:image" content="https://ifkrnow.github.io/og.jpg?v=3">
@@ -231,7 +231,7 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 </main>
 
 <main id="result" hidden>
-  <div class="friend" id="friend" hidden><b>친구가 보낸 결과예요</b>내 동네는 몇 등급일까? 아래 버튼으로 10초 진단</div>
+  <div class="friend" id="friend" hidden><b>친구가 보낸 결과예요</b>내 동네는 몇 등급일까? 아래 버튼으로 15초 진단</div>
   <div class="story"><img id="cardImg" alt="결과 스토리 카드"></div>
   <section class="profile" id="profile" hidden><h3 id="profH"></h3><dl id="profDl"></dl><p class="note">거리는 동 한가운데에서 잰 직선거리예요. 자세한 출처는 맨 아래에 있어요.</p></section>
   <div class="sharebox" id="shareBox">
@@ -986,7 +986,7 @@ function renderBar(){
 }
 function showStep(n){step=n;closeSub();$('menu').hidden=true;document.body.classList.remove('has-menu');[1,2,3,4].forEach(i=>$('st'+i).hidden=i!==n);$('introBox').hidden=n>1;document.querySelector('footer').hidden=true;renderBar();updateCTA();scrollTo(0,0)}
 function updateCTA(){if(!$('result').hidden)return;const cur=STEP[step-1],ok=S[cur.k]!==null;
-  $('go').classList.toggle('wait',!ok);$('go').textContent=!ok?cur.msg:step<4?'다음':'10초 진단 시작';
+  $('go').classList.toggle('wait',!ok);$('go').textContent=!ok?cur.msg:step<4?'다음':'15초 진단 시작';
   $('back').hidden=step===1;$('back').textContent='이전'}
 function pick(box,btn,adv=true){box.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===btn));updateCTA();
   if(adv)setTimeout(()=>step<4?showStep(step+1):start(),220)} // 살짝 눌린 걸 보여 준 뒤 넘어감
@@ -1211,7 +1211,7 @@ async function drawCard(sc,g){
   const tw=parts.reduce((a,[t,f])=>{x.font=f;return a+x.measureText(t).width},0);let tx=L+(RX-L-tw)/2;
   parts.forEach(([t,f,c])=>{x.font=f;x.fillStyle=c;x.fillText(t,tx,bx+48);tx+=x.measureText(t).width});
   cardBottom=bx+bh;
-  x.setTransform(1,0,0,1,0,0);x.textAlign='center';x.font=`600 30px ${F}`;x.fillStyle='#8f8781';x.fillText('ifkrnow.github.io · 우리 동네도 10초면 나와요',540,1872);x.textAlign='left';
+  x.setTransform(1,0,0,1,0,0);x.textAlign='center';x.font=`600 30px ${F}`;x.fillStyle='#8f8781';x.fillText('ifkrnow.github.io · 우리 동네도 15초면 나와요',540,1872);x.textAlign='left';
   cv.toBlob(b=>{if(seq!==cardSeq)return;cardBlob=b;$('cardImg').src=URL.createObjectURL(b);$('cardImg').classList.remove('busy')},'image/png');
 }
 $('introChar').innerHTML=charSVG('C');$('scanChar').innerHTML=charSVG('C');
@@ -1227,7 +1227,7 @@ async function share(){
 }
 $('copyCap').onclick=async()=>{
   const sc=myScore();
-  const t=`만약 ${IFW[S.c]}, 우리 동네 ${S.r}은 ${gradeOf(sc)}등급, ${dRow()?`${S.r} ${dongRank()[1]}개 동 중 ${dongRank()[0]}위`:`전국 ${NR}곳 중 ${rankOf(S.r,S.c,S.h,S.f)}위`} (재미로 보는 시뮬레이션)\n내 동네도 10초면 나와요 · @ifkr.now 프로필 링크\n#ifkrnow #내동네위기시뮬레이터 #${CRISIS[S.c].tag} #재난준비 #생존체크리스트`.replace(`${S.r}은`,eun(place()));
+  const t=`만약 ${IFW[S.c]}, 우리 동네 ${S.r}은 ${gradeOf(sc)}등급, ${dRow()?`${S.r} ${dongRank()[1]}개 동 중 ${dongRank()[0]}위`:`전국 ${NR}곳 중 ${rankOf(S.r,S.c,S.h,S.f)}위`} (재미로 보는 시뮬레이션)\n내 동네도 15초면 나와요 · @ifkr.now 프로필 링크\n#ifkrnow #내동네위기시뮬레이터 #${CRISIS[S.c].tag} #재난준비 #생존체크리스트`.replace(`${S.r}은`,eun(place()));
   track('caption_copy');
   try{await navigator.clipboard.writeText(t);toast('캡션을 복사했어요')}catch{showCopy(t,'캡션')}
 };
@@ -1236,7 +1236,7 @@ function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTi
 $('saveCard').onclick=share;
 async function sendResult(){
   const u=location.origin+location.pathname+'?utm_source=share&utm_medium=send'+hashOf(),g=gradeOf(myScore());
-  const t=`만약 ${IFW[S.c]}, ${eun(place())} ${g}등급이래. 네 동네도 10초면 나와`;
+  const t=`만약 ${IFW[S.c]}, ${eun(place())} ${g}등급이래. 네 동네도 15초면 나와`;
   track('link_send');
   try{if(navigator.share){await navigator.share({title:'내 동네 위기 시뮬레이터',text:t,url:u});return}}catch(e){if(e.name==='AbortError')return}
   try{await navigator.clipboard.writeText(t+' '+u);toast('링크를 복사했어요. 카톡에 붙여 넣으세요')}catch{showCopy(t+' '+u,'링크')}
