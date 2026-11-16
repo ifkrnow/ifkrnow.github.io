@@ -187,11 +187,6 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
 @media (prefers-reduced-motion:reduce){.pop,.scanbox::after{animation:none}}
 [hidden]{display:none!important}
-.dongbox{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
-.dongbox b{display:block;font-size:16px}.dongbox p{color:var(--sub);font-size:13px;margin:4px 0 10px}
-.dongopts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.dongopts:empty{display:none}
-.dongopts button{min-height:40px;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:14px}
-.dongopts button[aria-pressed=true]{background:var(--fg);color:var(--bg)}.dongopts .note{color:var(--sub);font-size:13px}
 </style>
 </head>
 <body>
@@ -235,7 +230,6 @@ body.has-menu .dock{background:linear-gradient(transparent,var(--bg) 14px)}
 <main id="result" hidden>
   <div class="friend" id="friend" hidden><b>친구가 보낸 결과예요</b>내 동네는 몇 등급일까? 아래 버튼으로 10초 진단</div>
   <div class="story"><img id="cardImg" alt="결과 스토리 카드"></div>
-  <div class="dongbox" id="dongBox" hidden><b id="dongH">동까지 고르면 등급이 달라져요</b><p id="dongSub"></p><input class="search" id="dongQ" placeholder="동 이름 또는 구 이름 (예: 탄방동)" autocomplete="off"><div class="dongopts" id="dongOpts"></div></div>
   <div class="sharebox" id="shareBox">
     <button id="saveCard" class="send">카드 저장 · 인스타 스토리 올리기</button>
     <a class="igbtn" href="https://www.instagram.com/ifkr.now/" target="_blank" rel="noopener" data-sns="instagram">인스타 @ifkr.now 팔로우 · 다른 위기 영상 보기</a>
@@ -1053,7 +1047,7 @@ function render(){
   $('detail').innerHTML=bars+`<div class="lines">${lines.map(t=>`<p>${t}</p>`).join('')}</div>`;
 
   const [bad,good]=whyOf(),li=a=>a.map(t=>`<li>${t}</li>`).join('');
-  $('whyH').textContent=`왜 ${eun(place())} ${g}등급?`;renderDongBox();
+  $('whyH').textContent=`왜 ${eun(place())} ${g}등급?`;
   const WHEN={war:'공습이 오면',apt:'폭격을 맞으면',out:'정전이 되면',quake:'지진이 나면',gas:'독가스가 퍼지면',nuke:'원전 사고가 나면',tsu:'해일이 오면',fire:'산불이 번지면',pand:'감염병이 돌면',cyber:'통신·결제가 멈추면'};
   $('followH').textContent=`${WHEN[S.c]}, ${eun(S.r)}? 영상으로 먼저 봐요`;
   $('why').innerHTML=`<p class="ins">${esc(insightOf(S.r,S.c))}</p><div><h4>불리한 점</h4><ul>${li(bad)}</ul></div><div><h4>버티는 점</h4><ul>${li(good)}</ul></div>
@@ -1266,20 +1260,6 @@ function openKit(){
 const closeKit=()=>{$('kit').hidden=true;document.body.style.overflow=''};
 $('kitClose').onclick=closeKit;$('kit').onclick=e=>{if(e.target===$('kit'))closeKit()};
 document.querySelectorAll('[data-sns]').forEach(a=>a.addEventListener('click',()=>track('follow_click',{sns:a.dataset.sns,where:a.closest('footer')?'footer':'result'})));
-// 동 고르기 (결과 화면): 동 이름·구 이름으로 거르고 누르면 그 동 기준으로 다시 계산
-function renderDongBox(){const box=$('dongBox');
-  if(S.shared||!DG||!DG.d[S.r]){box.hidden=true;if(!DG&&!S.shared)loadDG().then(d=>{if(d&&!$('result').hidden)renderDongBox()});return}
-  box.hidden=false;const x=dRow();
-  $('dongH').textContent=x?`${place()} 기준 결과예요`:`${S.r} 어느 동이에요? 동마다 등급이 달라요`;
-  $('dongSub').textContent=x?'다른 동으로 바꾸거나 시 전체로 볼 수 있어요':`${DG.t[S.r].n}개 동마다 대피소·병원 거리·아파트 비율이 달라요`;
-  drawDongOpts()}
-function drawDongOpts(){const q=$('dongQ').value.trim().replace(/\s+/g,''),rows=DG.d[S.r];
-  const hit=q?rows.map((x,i)=>[x,i]).filter(([x])=>x[1]>0&&(x[0].includes(q)||x[7].includes(q))):[];
-  const btn=(t,i)=>`<button type="button" data-i="${i}" aria-pressed="${S.d===i}">${esc(t)}</button>`;
-  $('dongOpts').innerHTML=(S.d!=null?`<button type="button" data-i="-1">${esc(S.r)} 전체로 보기</button>`:'')+(q?(hit.slice(0,12).map(([x,i])=>btn(x[0],i)).join('')||'<span class="note">그 이름의 동이 없어요</span>'):'');
-  $('dongOpts').querySelectorAll('button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;S.d=i<0?null:i;$('dongQ').value='';
-    track('dong_pick',{region:S.r,on:S.d!=null});render();$('cardImg').scrollIntoView({behavior:'smooth',block:'start'})})}
-$('dongQ').oninput=drawDongOpts;
 loadDG();
 track('page_view',{src:new URLSearchParams(location.search).get('utm_source')||'direct'});
 // 친구가 보낸 결과 링크로 들어온 경우
