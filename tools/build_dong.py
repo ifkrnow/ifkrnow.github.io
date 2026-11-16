@@ -85,13 +85,113 @@ def sido22(s, sgg):
     if s == '전남광주통합특별시': return '광주광역시' if sgg in ('동구', '서구', '남구', '북구', '광산구') else '전라남도'
     return {'강원특별자치도': '강원도', '전북특별자치도': '전라북도'}.get(s, s)
 
-out = {}; nsg = 0
+# 연령(65세 이상·12세 이하 비율, 주민등록 인구) · 1인 세대 비율(행정동 세대원수별 세대수)
+AGE = {}
+rows = list(csv.reader(open(RAW + 'pop.csv', encoding='cp949'))); hdr = rows[0]
+ages = [(i, int(re.match(r'(\d+)', c).group(1))) for i, c in enumerate(hdr) if re.match(r'\d+세', c)]
+for row in rows[1:]:
+    t = int(row[5]) or 1
+    AGE[row[0]] = (round(100 * sum(int(row[i]) for i, a in ages if a >= 65) / t), round(100 * sum(int(row[i]) for i, a in ages if a <= 12) / t))
+SOLO = {}
+for row in list(csv.reader(open(RAW + 'hh.csv', encoding='cp949')))[1:]:
+    if int(row[5]): SOLO[row[0]] = round(100 * int(row[6]) / int(row[5]))
+
+# 지형: AWS Terrain Tiles(terrarium, z10 ≈ 픽셀 120m, USGS SRTM 등 원자료) → 동 안 픽셀의 고도
+import numpy as np
+from PIL import Image, ImageDraw
+Z = 10; NPX = 256 * 2 ** Z; TILE = {}
+def gpx(lon, lat):
+    la = math.radians(lat)
+    return (lon + 180) / 360 * NPX, (1 - math.log(math.tan(la) + 1 / math.cos(la)) / math.pi) / 2 * NPX
+def tile(x, y):
+    if (x, y) not in TILE:
+        try:
+            a = np.asarray(Image.open(f'{RAW}terrain/{x}_{y}.png').convert('RGB'), dtype=np.float32)
+            TILE[(x, y)] = a[..., 0] * 256 + a[..., 1] + a[..., 2] / 256 - 32768
+        except FileNotFoundError: TILE[(x, y)] = None
+    return TILE[(x, y)]
+def mosaic(x0, y0, x1, y1):  # 픽셀 범위 [x0,x1)×[y0,y1) 고도, 없는 타일은 nan
+    m = np.full((y1 - y0, x1 - x0), np.nan, np.float32)
+    for ty in range(y0 // 256, (y1 - 1) // 256 + 1):
+        for tx in range(x0 // 256, (x1 - 1) // 256 + 1):
+            t = tile(tx, ty)
+            if t is None: continue
+            ax0, ay0 = max(x0, tx * 256), max(y0, ty * 256); ax1, ay1 = min(x1, tx * 256 + 256), min(y1, ty * 256 + 256)
+            m[ay0 - y0:ay1 - y0, ax0 - x0:ax1 - x0] = t[ay0 - ty * 256:ay1 - ty * 256, ax0 - tx * 256:ax1 - tx * 256]
+    return m
 for d in D:
-    k, h = min((km(d['cy'], d['cx'], h[0], h[1]), h) for h in H)
+    rings = [[gpx(*q) for q in ring] for poly in d['polys'] for ring in poly]
+    x0 = int(min(p[0] for r in rings for p in r)); y0 = int(min(p[1] for r in rings for p in r))
+    x1 = int(max(p[0] for r in rings for p in r)) + 2; y1 = int(max(p[1] for r in rings for p in r)) + 2
+    img = Image.new('L', (x1 - x0, y1 - y0), 0); dr = ImageDraw.Draw(img)
+    for poly in d['polys']:
+        for k, ring in enumerate(poly):
+            dr.polygon([(gpx(*q)[0] - x0, gpx(*q)[1] - y0) for q in ring], fill=0 if k else 1)
+    mask = np.asarray(img, bool); el = mosaic(x0, y0, x1, y1)
+    ys, xs = np.nonzero(mask)
+    if len(xs) == 0:  # 픽셀보다 작은 동 → 꼭짓점 평균 위치 한 점
+        cx, cy = gpx(d['cx'], d['cy']); xs, ys = np.array([int(cx) - x0]), np.array([int(cy) - y0])
+    v = el[ys, xs]; v = v[~np.isnan(v)]
+    pcx, pcy = xs.mean() + x0, ys.mean() + y0  # 동 면적의 무게중심(픽셀)
+    lon = pcx / NPX * 360 - 180; lat = math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * pcy / NPX))))
+    d['cx'], d['cy'] = lon, lat
+    mpp = 156543.03 * math.cos(math.radians(lat)) / 2 ** Z  # 픽셀 1칸 m
+    if len(v):
+        d['ele'] = int(round(float(np.mean(np.clip(v, 0, None)))))
+        d['rel'] = int(round(float(np.percentile(v, 90) - np.percentile(v, 10))))
+        d['low'] = int(round(100 * float(np.mean(v < 10))))
+    else: d['ele'] = d['rel'] = d['low'] = -1
+print('terrain tiles', sum(1 for t in TILE.values() if t is not None))
+# 바다까지 거리: 전국 행정동 경계를 z10 픽셀로 칠함 → 안 칠해진 곳 = 바다(휴전선 북쪽은 뺌) → 25km 안 최단거리
+GX0, GY0 = map(int, gpx(124.0, 38.9)); GX1, GY1 = map(int, gpx(132.0, 32.8))
+land = Image.new('L', (GX1 - GX0, GY1 - GY0), 0); ld = ImageDraw.Draw(land)
+for f in json.load(open(RAW + 'hjd.geojson', encoding='utf-8'))['features']:
+    g = f['geometry']
+    for poly in (g['coordinates'] if g['type'] == 'MultiPolygon' else [g['coordinates']]):
+        ld.polygon([(gpx(*q)[0] - GX0, gpx(*q)[1] - GY0) for q in poly[0]], fill=1)
+LAND = np.asarray(land, bool).copy()
+MDL = [(126.10, 37.70), (126.55, 37.76), (126.68, 37.93), (126.85, 37.96), (127.0, 38.10), (127.2, 38.28), (127.5, 38.30), (127.8, 38.32), (128.1, 38.27), (128.3, 38.35), (128.40, 38.55), (128.36, 38.62)]
+for x in range(LAND.shape[1]):  # 휴전선 북쪽(북한 땅)은 바다로 치지 않게 땅으로 채움
+    lon = (x + GX0) / NPX * 360 - 180
+    if 126.5 < lon < 128.4:
+        lat = float(np.interp(lon, [p[0] for p in MDL], [p[1] for p in MDL])); y = int(gpx(lon, lat)[1]) - GY0
+        LAND[:max(0, y), x] = True
+print('land px', int(LAND.sum()))
+for d in D:
+    px, py = gpx(d['cx'], d['cy']); px, py = int(px) - GX0, int(py) - GY0
+    mpp = 156543.03 * math.cos(math.radians(d['cy'])) / 2 ** Z; R0 = int(25000 / mpp)
+    w = LAND[max(0, py - R0):py + R0, max(0, px - R0):px + R0]; sy, sx = np.nonzero(~w)
+    oy, ox = py - max(0, py - R0), px - max(0, px - R0)
+    d['sea'] = round(float(np.min(np.hypot(sx - ox, sy - oy))) * mpp / 1000, 1) if len(sx) else -1
+
+# 역·고속도로 나들목: OpenStreetMap(© OpenStreetMap contributors, ODbL) — 없으면 건너뜀
+ST, IC = [], []
+try:
+    for e in json.load(open(RAW + 'osm.json', encoding='utf-8'))['elements']:
+        t = e.get('tags', {}); nm = t.get('name')
+        if not nm: continue
+        if t.get('highway') == 'motorway_junction':
+            if re.search(r'(JC|JCT|분기점|교차로)$', nm): continue  # 고속도로끼리 갈라지는 곳은 나가는 길이 아님
+            IC.append((e['lat'], e['lon'], nm if re.search(r'(IC|나들목|TG)$', nm) else nm + ' 나들목'))
+        elif t.get('railway') == 'station' and (t.get('station') in ('subway', 'light_rail') or t.get('subway') == 'yes' or t.get('train') == 'yes' or 'station' not in t):
+            ST.append((e['lat'], e['lon'], nm if nm.endswith('역') else nm + '역', t.get('station') in ('subway', 'light_rail') or t.get('subway') == 'yes'))
+except FileNotFoundError: pass
+print('stations', len(ST), 'ic', len(IC))
+names = sorted({h[2] for h in H} | {s[2] for s in ST} | {i[2] for i in IC}); ni = {n: i for i, n in enumerate(names)}
+
+out = {}; nsg = 0
+def near(d, L):
+    return min((km(d['cy'], d['cx'], p[0], p[1]), p) for p in L) if L else (-1, None)
+for d in D:
+    k, h = near(d, H)
     key = (sido22(d['sido'], d['sgg']), d['sgg'], d['nm'])
     apt, old = SG.get(key + ('공동주택비율',), -1), SG.get(key + ('노후주택비율',), -1); nsg += apt >= 0
-    out.setdefault(d['r'], []).append([d['nm'], d['pop'], round(d['area'], 2), d['sn'], d['sc'], round(k, 1), hi[h[2]], d['sgg'], apt, old])
+    sk, s = near(d, ST); ik, ic = near(d, IC); e65, kid = AGE.get(d['code'], (-1, -1))
+    out.setdefault(d['r'], []).append([d['nm'], d['pop'], round(d['area'], 2), d['sn'], d['sc'], round(k, 1), ni[h[2]], d['sgg'], apt, old,
+        e65, kid, SOLO.get(d['code'], -1), d['ele'], d['rel'], d['low'], d['sea'],
+        ni[s[2]] if s else -1, round(sk, 1), (1 if s and s[3] else 0), ni[ic[2]] if ic else -1, round(ik, 1)])
 print('sgis matched', nsg, '/', len(D))
-json.dump({'h': hn, 'd': out}, open('dong.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+# 행: [0동 1인구 2면적 3대피소수 4수용 5병원km 6병원 7구 8공동주택% 9노후% 10고령% 11어린이% 12 1인세대% 13평균고도m 14고저차m 15저지대% 16바다km 17역 18역km 19지하철? 20나들목 21나들목km]
+json.dump({'h': names, 'd': out}, open('dong.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 miss = [r for r in REGIONS if r not in out]
 print('regions', len(out), 'missing', miss, 'dongs', sum(map(len, out.values())), 'hosp', len(H))
