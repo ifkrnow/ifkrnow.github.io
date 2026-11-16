@@ -770,29 +770,29 @@ const dongEval=(r,c,i)=>{const x=dRow(r,i),B=[],G=[];if(!x||!x[1])return {adj:0,
   const rg=v=>v>=95?'90%↑':v<=5?'10%↓':`${v-5}~${v+5}%`;
   // 대피소: 동 주민 1명당 수용 인원을 도시 평균과 비교 (공습·폭격·독가스·원전은 그대로, 나머지는 절반)
   const per=sc/pop,a1=sn?clip(Math.round(3*Math.log2(per/(T.c/T.p))),6):-6,v1=Math.round(a1*(['war','apt','gas','nuke'].includes(c)?1:.5));
-  add(Math.abs(a1)>=2?v1:0,sn?`${nm} 대피소 ${sn}곳·1인당 ${per.toFixed(1)}명`:`${nm} 안에는 민방위 대피소가 없음`);
+  add(Math.abs(a1)>=2?v1:0,sn?`대피소 ${sn}곳·1인당 ${per.toFixed(1)}명분`:`동 안에 민방위 대피소 없음`);
   // 가장 가까운 종합병원
-  add(km<=1.5?2:km<=3?1:km<=7?0:km<=15?-2:-4,km<=7?`${nm}→${N[hi]} ${km}km`:`${nm}→가까운 종합병원 ${km}km`);
+  add(km<=1.5?2:km<=3?1:km<=7?0:km<=15?-2:-4,km<=7?`${N[hi]} ${km}km`:`가까운 종합병원 ${km}km`);
   // 지하철역: 공습·폭격·원전은 깊은 지하역이 대피처, 독가스는 지하가 오히려 위험
-  if(sub&&skm<=1&&['war','apt','nuke'].includes(c))add(2,`${nm}→${N[si]} ${skm}km(지하)`);
-  if(sub&&skm<=1&&c==='gas')add(-1,`${nm} 지하역(${N[si]})은 가스가 고임`);
+  if(sub&&skm<=1&&['war','apt','nuke'].includes(c))add(2,`${N[si]} ${skm}km, 지하 대피`);
+  if(sub&&skm<=1&&c==='gas')add(-1,`${N[si]} 지하는 가스가 고임`);
   // 고속도로 나들목: 멀리 빠져나가야 하는 위기
-  if(ii>=0&&['war','nuke','fire','tsu'].includes(c))add(ikm<=2?1:ikm>15?-2:0,ikm<=2?`${nm}→${N[ii]} ${ikm}km`:`${nm}→고속도로 나들목 ${ikm}km`);
+  if(ii>=0&&['war','nuke','fire','tsu'].includes(c))add(ikm<=2?1:ikm>15?-2:0,ikm<=2?`${N[ii]} ${ikm}km`:`고속도로 나들목 ${ikm}km`);
   // 인구 밀도: 도시 평균 대비
   const dq=(pop/area)/(T.p/T.a),a3=clip(Math.round(2*Math.log2(dq)),4);
-  if(['pand','out','cyber'].includes(c)&&Math.abs(a3)>=2)add(-a3,a3>0?`${nm} 인구 밀도 ${r} 평균의 ${dq.toFixed(1)}배`:`${nm} 사람이 ${r} 평균보다 덜 몰림`);
+  if(['pand','out','cyber'].includes(c)&&Math.abs(a3)>=2)add(-a3,a3>0?`인구 밀도 ${r} 평균의 ${dq.toFixed(1)}배`:`${r} 평균보다 사람이 덜 몰림`);
   // 고령·1인 가구: 이동과 안부 확인
-  if(e65>=30)add(-2,`${nm} 65세 이상 ${e65}%, 피난이 느림`);else if(e65>=0&&e65<=12&&c!=='pand')add(1,`${nm} 65세 이상 ${e65}%로 젊은 동네`);
-  if(solo>=55&&['out','cyber','pand','quake'].includes(c))add(-1,`${nm} 1인 세대 ${solo}%, 서로 챙길 사람 적음`);
+  if(e65>=30)add(-2,`65세 이상 ${e65}%, 피난이 느림`);else if(e65>=0&&e65<=12&&c!=='pand')add(1,`65세 이상 ${e65}%, 젊은 동네`);
+  if(solo>=55&&['out','cyber','pand','quake'].includes(c))add(-1,`1인 세대 ${solo}%, 서로 챙길 사람 적음`);
   // 지형: 고도 타일(평균 고도·고저차·해발 10m 아래 비율) + 바다까지 거리
-  if(c==='tsu'){if(sea<0)add(3,`${nm} 바다 25km↑·해발 ${ele}m`);else if(sea<=1.5&&low>=30)add(-4,`${nm} 바다 ${sea}km·해발 10m 아래 ${low}%`);else if(sea<=3)add(-2,`${nm} 바다까지 ${sea}km`);else if(sea>=10)add(1,`${nm} 바다까지 ${sea}km`)}
-  if(c==='fire'){if(rel>=250)add(-3,`${nm} 산지, 고저차 ${rel}m`);else if(rel>=0&&rel<40)add(1,`${nm} 평지, 고저차 ${rel}m`)}
-  if(c==='gas'){if(low>=50)add(-2,`${nm} 해발 10m 아래가 ${low}%`);else if(ele>=80&&low<10)add(1,`${nm} 평균 해발 ${ele}m 언덕 동네`)}
-  if(c==='quake'){if(low>=60&&sea>=0&&sea<=5)add(-2,`${nm} 바닷가 저지대 ${low}%, 매립지 가능`);if(rel>=300)add(-1,`${nm} 산비탈, 고저차 ${rel}m`)}
+  if(c==='tsu'){if(sea<0)add(3,`바다 25km↑·해발 ${ele}m`);else if(sea<=1.5&&low>=30)add(-4,`바다 ${sea}km·해발 10m 아래 ${low}%`);else if(sea<=3)add(-2,`바다까지 ${sea}km`);else if(sea>=10)add(1,`바다까지 ${sea}km`)}
+  if(c==='fire'){if(rel>=250)add(-3,`산지, 고저차 ${rel}m`);else if(rel>=0&&rel<40)add(1,`평지, 고저차 ${rel}m`)}
+  if(c==='gas'){if(low>=50)add(-2,`해발 10m 아래가 ${low}%`);else if(ele>=80&&low<10)add(1,`평균 해발 ${ele}m 언덕 동네`)}
+  if(c==='quake'){if(low>=60&&sea>=0&&sea<=5)add(-2,`바닷가 저지대 ${low}%, 매립지 가능`);if(rel>=300)add(-1,`산비탈, 고저차 ${rel}m`)}
   // 공동주택·노후주택 (통계청 2022, 10% 구간)
-  if(apt>=0&&c==='apt'){const a=-Math.round((apt-50)/12);if(Math.abs(a)>=2)add(a,a<0?`${nm} 공동주택 ${rg(apt)}·고층 밀집`:`${nm} 공동주택 ${rg(apt)}·낮은 집`)}
-  if(apt>=0&&c==='war'){const a=Math.round((apt-50)/25);if(a>=2)add(a,`${nm} 공동주택 ${rg(apt)}·지하주차장`)}
-  if(old>=0&&c==='quake'){const a=-Math.round((old-55)/10);if(Math.abs(a)>=2)add(a,a<0?`${nm} 오래된 주택 ${rg(old)}`:`${nm} 오래된 주택 ${rg(old)}뿐`)}
+  if(apt>=0&&c==='apt'){const a=-Math.round((apt-50)/12);if(Math.abs(a)>=2)add(a,a<0?`공동주택 ${rg(apt)}·고층 밀집`:`공동주택 ${rg(apt)}·낮은 집`)}
+  if(apt>=0&&c==='war'){const a=Math.round((apt-50)/25);if(a>=2)add(a,`공동주택 ${rg(apt)}·지하주차장`)}
+  if(old>=0&&c==='quake'){const a=-Math.round((old-55)/10);if(Math.abs(a)>=2)add(a,a<0?`오래된 주택 ${rg(old)}`:`오래된 주택 ${rg(old)}뿐`)}
   const ord=a=>a.sort((p,q)=>q[0]-p[0]).map(z=>z[1]);
   return {adj:clip(adj,10),bad:ord(B),good:ord(G)}};
 // 결과 화면 「우리 동네 생존 프로필」: 고른 동의 실제 숫자
@@ -1187,7 +1187,17 @@ async function drawCard(sc,g){
   // 주요 시설은 통째로 들어가는 것만 이어 붙임 (중간에 잘리지 않게)
   x.font=`600 35px ${F}`;let fac='';for(const k of FAC[S.r].k){const t=fac?fac+' · '+k:k;if(x.measureText(t).width>RX-L-KW)break;fac=t}
   const fl=CRISIS[S.c].fl[S.f],ft=CRISIS[S.c].ft.split('.')[0];
-  [dRow()?[dRow()[0],`인구 ${(dRow()[1]/10000).toFixed(1)}만 · ${dRow()[22]>0?`아파트 ${dRow()[22]}단지`:`해발 ${dRow()[13]}m`} · 고령 ${dRow()[10]}%`,sub]:['주요 시설',fac,sub],[`${FLOOR[S.f]} ${pts(fl)}`,ft,fl<0?'#ff8a2c':fg],[`${HOME[S.h].name} ${pts(HOME[S.h].adj)}`,HOME[S.h].why,HOME[S.h].adj<0?'#ff8a2c':fg]].forEach(([k,t,col])=>{
+  const dx=dRow();
+  if(dx){ // 동네 숫자 4칸: 큰 숫자 + 작은 이름, 칸 사이는 가는 선 (색 배지 없이)
+    const [,pop,,sn,,km,hi,,apt,,e65,,,ele,,,,si,skm,,,,ac]=dx,man=n=>n>=10000?`${(n/10000).toFixed(1)}만`:n.toLocaleString();
+    const st=[[man(pop),'인구'],ac>0?[`${ac}단지`,'아파트']:apt>=0?[apt>=95?'90%↑':apt<=5?'10%↓':`${apt-5}%+`,'공동주택']:[`${ele}m`,'평균 해발'],
+      [e65>=0?`${e65}%`:'-','65세 이상'],si>=0&&skm<=2?[`${skm}km`,DG.h[si]]:[`${km}km`,'종합병원']];
+    const cw=(RX-L)/4;x.fillStyle='#2e2926';x.fillRect(L,y-30,RX-L,2);
+    st.forEach(([v,k],n)=>{const cx=L+cw*n+cw/2;x.textAlign='center';x.font=`800 46px ${F}`;x.fillStyle=fg;x.fillText(fit(v,cw-16),cx,y+24);
+      x.font=`600 27px ${F}`;x.fillStyle=sub;x.fillText(fit(k,cw-16),cx,y+62);if(n){x.fillStyle='#2e2926';x.fillRect(L+cw*n,y-12,2,84)}});
+    x.textAlign='left';y+=118}
+  // 동 카드는 층·가구가 위 부제에 있어 줄을 생략하고 숫자 칸을 넣음
+  if(!dx)[['주요 시설',fac,sub],[`${FLOOR[S.f]} ${pts(fl)}`,ft,fl<0?'#ff8a2c':fg],[`${HOME[S.h].name} ${pts(HOME[S.h].adj)}`,HOME[S.h].why,HOME[S.h].adj<0?'#ff8a2c':fg]].forEach(([k,t,col])=>{
     x.font=`800 35px ${F}`;x.fillStyle=col;x.fillText(k,L,y);const kw=Math.max(KW,x.measureText(k+'  ').width);
     x.font=`600 35px ${F}`;x.fillStyle=sub;x.fillText(fit(t,RX-L-kw),L+kw,y);y+=50});
   x.fillStyle='#2e2926';x.fillRect(L,y-14,RX-L,2);
