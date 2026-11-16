@@ -803,7 +803,7 @@ function renderProfile(){const box=$('profile'),x=dRow();if(!x||!x[1]){box.hidde
     ['가까운 역',si>=0?`${N[si]} ${skm}km${sub?' (지하철)':''}`:'자료 없음'],['종합병원',`${N[hi]} ${km}km`],
     ['민방위 대피소',sn?`${sn}곳 · 주민 1명당 ${(sc/pop).toFixed(1)}명분`:'동 안에 없음'],['고속도로',ii>=0?`${N[ii]} ${ikm}km`:'자료 없음'],
     ['공동주택',apt>=0?`${apt>=95?'90% 이상':apt<=5?'10% 미만':`${apt-5}~${apt+5}%`}${old>=0?` · 오래된 주택 ${old>=95?'90% 이상':old<=5?'10% 미만':`${old-5}~${old+5}%`}`:''}`:'자료 없음']];
-  $('profH').textContent=`${place()} 생존 프로필`;
+  $('profH').textContent=`위기 때 ${eun(place())}?`;
   $('profDl').innerHTML=rows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');box.hidden=false}
 const myScore=(i=S.d)=>Math.max(0,Math.min(100,scoreOf(S.r,S.c,S.h)+dongEval(S.r,S.c,i).adj));
 const dongRank=()=>{const me=myScore();return [1+DG.d[S.r].filter((x,i)=>x[1]>0&&myScore(i)>me).length,DG.t[S.r].n]};
