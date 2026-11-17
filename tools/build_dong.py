@@ -14,6 +14,7 @@ def region_of(sido, sgg):
     for r, s in SIDO.items():
         if sido == s: return r
     if sido == '전남광주통합특별시' and sgg in ('동구', '서구', '남구', '북구', '광산구'): return '광주'
+    if sido == '경기도' and sgg == '광주시': return '경기광주'  # 광주광역시와 이름이 겹쳐 따로
     if sgg == '울릉군': return '울릉도'
     if sgg == '창원시진해구': return '진해'
     for r in REGIONS:
